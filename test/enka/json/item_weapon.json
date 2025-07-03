@@ -1,0 +1,25 @@
+{
+  "itemId": 11302,
+  "weapon": {
+    "level": 1,
+    "affixMap": {
+      "111302": 4
+    }
+  },
+  "flat": {
+    "nameTextMapHash": "1608953539",
+    "rankLevel": 3,
+    "itemType": "ITEM_WEAPON",
+    "icon": "UI_EquipIcon_Sword_Dawn",
+    "weaponStats": [
+      {
+        "appendPropId": "FIGHT_PROP_BASE_ATTACK",
+        "statValue": 39
+      },
+      {
+        "appendPropId": "FIGHT_PROP_CRITICAL_HURT",
+        "statValue": 10.2
+      }
+    ]
+  }
+}

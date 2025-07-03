@@ -1,0 +1,38 @@
+# weapon.py
+
+from dataclasses import dataclass
+from typing import List
+
+from src.core.models.artifact import Artifact
+from src.core.models.stat import Stat
+from src.core.models.weapon import Weapon
+
+
+@dataclass
+class Character:
+    """武器类"""
+    # id
+    avatarId: int
+    # 名称
+    name: str
+    # 描述
+    description: str
+    # 等级
+    level: int
+    # 稀有度
+    rank: int
+    # 图标
+    icon: str
+    # 天赋
+    talent: List[Stat]
+    # 好感度
+    friendship: int
+    # 武器
+    weapon: Weapon
+    # 圣遗物
+    artifact_flower: Artifact
+    artifact_plume: Artifact
+    artifact_sands: Artifact
+    artifact_goblet: Artifact
+    artifact_circlet: Artifact
+    # 面板
