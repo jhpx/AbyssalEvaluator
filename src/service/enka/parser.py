@@ -4,12 +4,12 @@ from typing import Dict
 
 from dacite import from_dict
 
-from src.core.enums.position import Position
-from src.core.enums.stat_type import StatType
-from src.core.models.artifact import Artifact
-from src.core.models.character import Character
-from src.core.models.stat import Stat
-from src.core.models.weapon import Weapon
+from src.models.position import Position
+from src.models.stat_type import StatType
+from src.models.artifact import Artifact
+from src.models.character import Character
+from src.models.stat import Stat
+from src.models.weapon import Weapon
 
 
 class EnkaParser:

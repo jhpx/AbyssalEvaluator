@@ -1,7 +1,7 @@
 # prop_id_map.py
 
-from src.core.enums.position import Position
-from src.core.enums.stat_type import StatType
+from src.models.position import Position
+from src.models.stat_type import StatType
 
 ID_MAP = {
     # 生之花

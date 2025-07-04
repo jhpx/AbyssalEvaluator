@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from typing import List
 
-from src.core.models.stat import Stat
+from src.models.stat import Stat
 
 
 @dataclass

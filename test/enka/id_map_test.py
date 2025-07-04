@@ -2,8 +2,8 @@ import unittest
 from pathlib import Path
 
 import json
-from src.core.models.artifact import Artifact
-from src.core.models.weapon import Weapon
+from src.models.artifact import Artifact
+from src.models.weapon import Weapon
 from src.service.enka.parser import EnkaParser
 from src.service.enka.prop_id_map import ID_MAP, SUB_ID_MAP
 

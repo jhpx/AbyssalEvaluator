@@ -1,6 +1,6 @@
 # stat_type.py
 
-from src.core.enums.mvenum import MVEnum
+from src.core.misc.mvenum import MVEnum
 
 
 class StatType(MVEnum):

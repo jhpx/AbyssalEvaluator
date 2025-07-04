@@ -1,6 +1,6 @@
 # position.py
 
-from src.core.enums.mvenum import MVEnum
+from src.core.misc.mvenum import MVEnum
 
 
 class Position(MVEnum):

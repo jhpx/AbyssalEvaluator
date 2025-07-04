@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 dacite = "*"
+duckdb = "*"
 
 [dev-packages]
 

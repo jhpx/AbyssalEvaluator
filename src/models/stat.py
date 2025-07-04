@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 
-from src.core.enums.stat_type import StatType
+from src.models.stat_type import StatType
 
 
 @dataclass

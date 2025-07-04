@@ -3,9 +3,9 @@
 from dataclasses import dataclass
 from typing import List
 
-from src.core.models.artifact import Artifact
-from src.core.models.stat import Stat
-from src.core.models.weapon import Weapon
+from src.models.artifact import Artifact
+from src.models.stat import Stat
+from src.models.weapon import Weapon
 
 
 @dataclass

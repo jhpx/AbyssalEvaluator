@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 from typing import List
 
-from src.core.enums.position import Position
+from src.models.position import Position
 # artifact.py
 
-from src.core.models.stat import Stat
+from src.models.stat import Stat
 
 
 @dataclass
