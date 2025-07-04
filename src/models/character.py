@@ -10,7 +10,7 @@ from src.models.weapon import Weapon
 
 @dataclass
 class Character:
-    """武器类"""
+    """角色类"""
     # id
     avatarId: int
     # 名称

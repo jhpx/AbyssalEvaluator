@@ -4,11 +4,11 @@ from typing import Dict
 
 from dacite import from_dict
 
-from src.models.position import Position
-from src.models.stat_type import StatType
 from src.models.artifact import Artifact
 from src.models.character import Character
-from src.models.stat import Stat
+from src.models.player import Player
+from src.models.position import Position
+from src.models.stat import Stat, StatType
 from src.models.weapon import Weapon
 
 
@@ -128,7 +128,7 @@ class EnkaParser:
             if isinstance(parsed_item, Weapon):
                 weapon = parsed_item
             elif isinstance(parsed_item, Artifact):
-                artifact_map[parsed_item.position]=parsed_item
+                artifact_map[parsed_item.position] = parsed_item
 
         # 构造参数字典
         character_dict = {
@@ -149,3 +149,31 @@ class EnkaParser:
         }
 
         return from_dict(data_class=Character, data=character_dict)
+
+    @staticmethod
+    def parse_player(data: Dict) -> Player:
+        """解析玩家信息"""
+        player_data = data.get("playerInfo", {})
+
+        # 解析角色列表
+        characters_data = player_data.get("avatarInfoList", [])
+        characters = []
+        for character_data in characters_data:
+            characters.append(EnkaParser.parse_character(character_data))
+
+        # 构造Player对象
+        player_dict = {
+            "uid": int(player_data.get("uid", 0)),
+            "nickname": player_data.get("nickname", ""),
+            "level": player_data.get("level", 1),
+            "world_level": player_data.get("worldLevel", 0),
+            "finish_achievement_num": player_data.get("finishAchievementNum", 0),
+            "tower_floor_index": player_data.get("towerFloorIndex", 0),
+            "tower_level_index": player_data.get("towerLevelIndex", 0),
+            "tower_star_index": player_data.get("towerStarIndex", 0),
+            "profile_icon_id": player_data.get("profilePicture").get("id", 100000),
+            "full_friendship_num": player_data.get("fetterCount", 0),
+            "characters": characters
+        }
+
+        return from_dict(data_class=Player, data=player_dict)

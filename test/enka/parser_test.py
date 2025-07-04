@@ -1,13 +1,13 @@
-#parser_test.py
+# parser_test.py
 
 import unittest
 
 import json
-from src.models.position import Position
-from src.models.stat_type import StatType
 from src.models.artifact import Artifact
 from src.models.character import Character
-from src.models.stat import Stat
+from src.models.player import Player
+from src.models.position import Position
+from src.models.stat import Stat, StatType
 from src.models.weapon import Weapon
 from src.service.enka.parser import EnkaParser
 
@@ -52,6 +52,7 @@ class TestEnkaParser(unittest.TestCase):
             self.assertEqual(weapon.weapon_stats[i].stat_type, expected_weapon.weapon_stats[i].stat_type)
             self.assertAlmostEqual(weapon.weapon_stats[i].stat_value, expected_weapon.weapon_stats[i].stat_value,
                                    delta=0.01)
+
     def test_parse_artifact(self, reliquary_json='json/item_reliquary.json'):
         # 读取测试 JSON 文件
         with open(reliquary_json, 'r', encoding='utf-8') as f:
@@ -72,15 +73,15 @@ class TestEnkaParser(unittest.TestCase):
             icon="UI_RelicIcon_15003_3",
             main_stat_id=13007,
             sub_stat_ids=[
-              501234,
-              501062,
-              501222,
-              501242,
-              501221,
-              501241,
-              501222,
-              501242,
-              501234
+                501234,
+                501062,
+                501222,
+                501242,
+                501221,
+                501241,
+                501222,
+                501242,
+                501234
             ],
             main_stat=Stat(StatType("FIGHT_PROP_CRITICAL"), stat_value=31.1),
             sub_stats=[
@@ -110,7 +111,8 @@ class TestEnkaParser(unittest.TestCase):
         self.assertEqual(len(artifact.sub_stats), len(expected_artifact.sub_stats))
         for i in range(len(artifact.sub_stats)):
             self.assertEqual(artifact.sub_stats[i].stat_type, expected_artifact.sub_stats[i].stat_type)
-            self.assertAlmostEqual(artifact.sub_stats[i].stat_value, expected_artifact.sub_stats[i].stat_value, delta=0.01)
+            self.assertAlmostEqual(artifact.sub_stats[i].stat_value, expected_artifact.sub_stats[i].stat_value,
+                                   delta=0.01)
         self.assertSetEqual(set(artifact.sub_stat_ids), set(expected_artifact.sub_stat_ids))
 
     def test_parse_item(self):
@@ -124,12 +126,18 @@ class TestEnkaParser(unittest.TestCase):
         artifact = EnkaParser.parse_equip_item(data2)
         self.assertIsInstance(artifact, Artifact)
 
-
     def test_parse_character(self):
         with open('json/character.json', 'r', encoding='utf-8') as f:
             data = json.load(f)
         character = EnkaParser.parse_character(data)
         self.assertIsInstance(character, Character)
+
+    def test_parse_player(self):
+        with open('json/player.json', 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        player = EnkaParser.parse_player(data)
+        self.assertIsInstance(player, Player)
+
 
 if __name__ == '__main__':
     unittest.main()
