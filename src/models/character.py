@@ -12,7 +12,7 @@ from src.models.weapon import Weapon
 class Character:
     """角色类"""
     # id
-    avatarId: int
+    avatarId: str
     # 名称
     name: str
     # 描述

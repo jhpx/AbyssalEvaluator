@@ -1,0 +1,65 @@
+from src.models.player import Player
+from src.util.logger import logger
+import httpx
+import anyio
+
+from src.service.enka.api import EnkaApi
+from src.service.enka.parser import EnkaParser
+from src.util.http_util import fetch_http_json
+
+
+async def sync_player(client: httpx.AsyncClient, uid: str):
+    """
+    获取并解析玩家信息，输出到控制台
+
+    :param client: httpx.AsyncClient 实例
+    :param uid: 玩家 UID
+    """
+    url = EnkaApi.get_player_url(uid)
+    raw_data = await fetch_http_json(client, url)
+
+    if not raw_data:
+        logger.error(f"无法获取玩家数据（UID={uid}），请检查网络连接或UID是否正确")
+        return
+
+    try:
+        player = EnkaParser.parse_player(raw_data)
+        print_player(player)
+
+    except Exception as e:
+        logger.error(f"解析玩家数据失败（UID={uid}）: {e}")
+
+
+def print_player(player: Player):
+    print(f"\n【UID={player.uid}】{player.nickname} 的角色信息如下：")
+    print(f"等级: {player.level}")
+    print(f"世界等级: {player.world_level}")
+    print(f"成就数量: {player.finish_achievement_num}")
+    print(f"深境螺旋: 第{player.tower_floor_index}层 第{player.tower_level_index}间")
+    print(f"满好感角色数量: {player.full_friendship_num}")
+    for idx, character in enumerate(player.characters, 1):
+        print(f"\n{idx}. {character.name} (ID: {character.avatarId})")
+        print(f"   等级: {character.level}")
+        print(f"   好感度: {character.friendship}")
+
+        if character.weapon:
+            print(
+                f"   武器: {character.weapon.name} (等级: {character.weapon.level}) (精炼: {character.weapon.refine})")
+
+        if character.artifact_flower:
+            print(f"   圣遗物花: {character.artifact_flower.name} (等级: {character.artifact_flower.level})")
+            print(f"   圣遗物羽: {character.artifact_plume.name} (等级: {character.artifact_plume.level})")
+            print(f"   圣遗物沙: {character.artifact_sands.name} (等级: {character.artifact_sands.level})")
+            print(f"   圣遗物杯: {character.artifact_goblet.name} (等级: {character.artifact_goblet.level})")
+            print(f"   圣遗物冠: {character.artifact_circlet.name} (等级: {character.artifact_circlet.level})")
+
+
+async def main():
+    uid = "101242308"
+    async with httpx.AsyncClient(proxy="http://127.0.0.1:4081") as client:
+        async with anyio.create_task_group() as tg:
+            tg.start_soon(sync_player, client, uid)
+
+
+if __name__ == "__main__":
+    anyio.run(main)

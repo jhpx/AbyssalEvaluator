@@ -13,8 +13,6 @@ class Weapon:
     id: int
     # 名称
     name: str
-    # 描述
-    description: str
     # 等级
     level: int
     # 突破等级

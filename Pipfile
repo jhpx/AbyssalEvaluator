@@ -6,6 +6,9 @@ name = "pypi"
 [packages]
 dacite = "*"
 duckdb = "*"
+starlette = "*"
+httpx = "*"
+pyarrow = "*"
 
 [dev-packages]
 

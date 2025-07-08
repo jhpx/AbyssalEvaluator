@@ -18,7 +18,7 @@ class DuckDBSession:
         :param db_path: DuckDB 数据库存储路径，默认为 data/main.db
         """
 
-        db_path = Path(__file__).parent.parent.parent / "data" / "main.db"
+        db_path = Path(__file__).parent.parent.parent.parent / "data" / "main.db"
         os.makedirs(db_path.parent, exist_ok=True)
         self.__conn = duckdb.connect(str(db_path))
 
@@ -91,20 +91,27 @@ class DuckDBSession:
         """
         return self.__conn.execute(sql)
 
-    def register_df(self, df, table_name):
+    def register_table(self, table_object, table_name):
         """
-        将 pandas DataFrame 注册为 DuckDB 表
+        将 pandas Dataframe/pyArrow Table 注册为 DuckDB 表
 
-        :param df: pandas DataFrame
+        :param table_object: pandas Dataframe/pyArrow Table
         :param table_name: 表名
         """
-        self.__conn.register(table_name, df)
+        self.__conn.register(table_name, table_object)
 
-    def persist_table(self, source_table, target_table):
+    def persist_table(self, source_table_name, target_table_name):
         """
         将A表复制到B表
         """
-        self.__conn.execute(f"CREATE OR REPLACE TABLE {target_table} AS SELECT * FROM {source_table}")
+        self.__conn.execute(f"CREATE OR REPLACE TABLE {target_table_name} AS SELECT * FROM {source_table_name}")
+
+    def save_table(self, table_object, table_name):
+        """
+        把数据存入 DuckDB 表
+        """
+        self.register_table(table_object, "temp_df")
+        self.persist_table("temp_df", table_name)
 
     def execute_sql_file(self, file_path):
         """

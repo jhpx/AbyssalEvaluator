@@ -36,7 +36,6 @@ class EnkaParser:
         weapon_dict = {
             "id": data.get("itemId", 0),
             "name": f"TEXT_MAP_{flat_data.get('nameTextMapHash', 'UNKNOWN')}",
-            "description": "",
             "level": weapon_data.get("level", 1),
             "promote_level": weapon_data.get("promoteLevel", 0),
             "refine": refine + 1,
@@ -156,14 +155,14 @@ class EnkaParser:
         player_data = data.get("playerInfo", {})
 
         # 解析角色列表
-        characters_data = player_data.get("avatarInfoList", [])
+        characters_data = data.get("avatarInfoList", [])
         characters = []
         for character_data in characters_data:
             characters.append(EnkaParser.parse_character(character_data))
 
         # 构造Player对象
         player_dict = {
-            "uid": int(player_data.get("uid", 0)),
+            "uid": int(data.get("uid", 0)),
             "nickname": player_data.get("nickname", ""),
             "level": player_data.get("level", 1),
             "world_level": player_data.get("worldLevel", 0),
