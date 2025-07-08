@@ -1,6 +1,7 @@
 from typing import Optional
 
 from src.core.duckdb.duckdb_engine import DuckDBSession
+from src.models.meta.character_info import CharacterInfo
 from src.models.meta.weapon_info import WeaponInfo
 from src.models.player import Player
 from src.util.logger import logger
@@ -37,12 +38,18 @@ async def sync_player(client: httpx.AsyncClient, uid: str):
 
     if player:
         duckdb_session = DuckDBSession()
+        # 关联角色
+        character_info_rows = duckdb_session.extract_table("ods_character_info").fetchall()
+        character_dict = {r[0]: CharacterInfo(*r) for r in character_info_rows}
         # 关联武器
         weapon_info_rows = duckdb_session.extract_table("ods_weapon_info").fetchall()
         weapon_dict = {r[0]: WeaponInfo(*r) for r in weapon_info_rows}
 
         for character in player.characters:
             weapon_info = weapon_dict.get(character.weapon.id)
+            character_info = character_dict.get(character.avatarId)
+            character.name = character_info.name_chs if character_info else "未知角色"
+            character.icon = character_info.icon if character_info else "未知图标"
             character.weapon.name = weapon_info.name_chs if weapon_info else "未知武器"
             character.weapon.type = weapon_info.type if weapon_info else "未知武器类型"
 

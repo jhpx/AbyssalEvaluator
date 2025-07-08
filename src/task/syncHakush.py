@@ -38,8 +38,24 @@ async def sync_artifact(client: httpx.AsyncClient):
 
 
 async def sync_character(client: httpx.AsyncClient):
-    pass
+    url = HakushApi.get_character_list_url()
+    # raw_data = await fetch_http_json(client, url)
+    raw_data = await fetch_local_json(
+        "F:\\Workspace-Private\\workspace-python\\DataProcess\\AbyssalEvaluator\\test\\hakush\\json\\character.json")
 
+    if not raw_data:
+        logger.error(f"无法获取角色数据，请检查网络连接是否正确")
+        return
+
+    duckdb_session = DuckDBSession()
+    character_list = []
+    try:
+        character_list = HakushParser.parse_character_infos(raw_data)
+    except Exception as e:
+        logger.error(f"解析角色数据失败: {e}")
+
+    sync_duckdb(character_list, "ods_character_info", duckdb_session)
+    pass
 
 def sync_duckdb(items: List[dataclass], table_name: str, duckdb_session: DuckDBSession):
     """
