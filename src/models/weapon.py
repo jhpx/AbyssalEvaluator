@@ -11,8 +11,6 @@ class Weapon:
     """武器类"""
     # id
     id: int
-    # 名称
-    name: str
     # 等级
     level: int
     # 突破等级
@@ -25,3 +23,7 @@ class Weapon:
     icon: str
     # 武器附加属性
     weapon_stats: List[Stat]
+    # 名称
+    name: str = ""
+    # 类型
+    type: str = ""

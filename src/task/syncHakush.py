@@ -21,14 +21,14 @@ async def sync_weapon(client: httpx.AsyncClient):
         logger.error(f"无法获取武器数据，请检查网络连接是否正确")
         return
 
-    db_session = DuckDBSession()
+    duckdb_session = DuckDBSession()
     weapon_list = []
     try:
         weapon_list = HakushParser.parse_weapon_infos(raw_data)
     except Exception as e:
         logger.error(f"解析武器数据失败: {e}")
 
-    sync_duckdb(weapon_list, "ods_weapon_info", db_session)
+    sync_duckdb(weapon_list, "ods_weapon_info", duckdb_session)
 
     pass
 
@@ -47,7 +47,7 @@ def sync_duckdb(items: List[dataclass], table_name: str, duckdb_session: DuckDBS
 
     :param items: 实体类对象列表（支持 dataclass 或 pydantic 模型）
     :param table_name: DuckDB 中目标表名
-    :param db_session: 已有的 DuckDB 会话实例
+    :param duckdb_session: 已有的 DuckDB 会话实例
     """
     if not items:
         return

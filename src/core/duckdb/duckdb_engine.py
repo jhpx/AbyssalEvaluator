@@ -129,7 +129,7 @@ class DuckDBSession:
 
         :param file_path: SQL 文件路径
         """
-        return self.__conn.execute(f"SELECT * FROM {table_name}").df()
+        return self.__conn.execute(f"SELECT * FROM {table_name}")
 
     def close(self):
         """

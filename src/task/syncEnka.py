@@ -1,3 +1,7 @@
+from typing import Optional
+
+from src.core.duckdb.duckdb_engine import DuckDBSession
+from src.models.meta.weapon_info import WeaponInfo
 from src.models.player import Player
 from src.util.logger import logger
 import httpx
@@ -5,7 +9,7 @@ import anyio
 
 from src.service.enka.api import EnkaApi
 from src.service.enka.parser import EnkaParser
-from src.util.http_util import fetch_http_json
+from src.util.http_util import fetch_http_json, fetch_local_json
 
 
 async def sync_player(client: httpx.AsyncClient, uid: str):
@@ -16,18 +20,33 @@ async def sync_player(client: httpx.AsyncClient, uid: str):
     :param uid: 玩家 UID
     """
     url = EnkaApi.get_player_url(uid)
-    raw_data = await fetch_http_json(client, url)
+
+    # raw_data = await fetch_http_json(client, url)
+    raw_data = await fetch_local_json(
+        "F:\\Workspace-Private\\workspace-python\\DataProcess\\AbyssalEvaluator\\test\\enka\\json\\player.json")
 
     if not raw_data:
         logger.error(f"无法获取玩家数据（UID={uid}），请检查网络连接或UID是否正确")
         return
 
+    player = None
     try:
         player = EnkaParser.parse_player(raw_data)
-        print_player(player)
-
     except Exception as e:
         logger.error(f"解析玩家数据失败（UID={uid}）: {e}")
+
+    if player:
+        duckdb_session = DuckDBSession()
+        # 关联武器
+        weapon_info_rows = duckdb_session.extract_table("ods_weapon_info").fetchall()
+        weapon_dict = {r[0]: WeaponInfo(*r) for r in weapon_info_rows}
+
+        for character in player.characters:
+            weapon_info = weapon_dict.get(character.weapon.id)
+            character.weapon.name = weapon_info.name_chs if weapon_info else "未知武器"
+            character.weapon.type = weapon_info.type if weapon_info else "未知武器类型"
+
+        print_player(player)
 
 
 def print_player(player: Player):

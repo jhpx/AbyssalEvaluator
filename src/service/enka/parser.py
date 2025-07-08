@@ -35,7 +35,6 @@ class EnkaParser:
         # 构造参数字典
         weapon_dict = {
             "id": data.get("itemId", 0),
-            "name": f"TEXT_MAP_{flat_data.get('nameTextMapHash', 'UNKNOWN')}",
             "level": weapon_data.get("level", 1),
             "promote_level": weapon_data.get("promoteLevel", 0),
             "refine": refine + 1,
@@ -132,11 +131,8 @@ class EnkaParser:
         # 构造参数字典
         character_dict = {
             "avatarId": avatar_id,
-            "name": f"TEXT_MAP_UNKNOWN",  # 可替换为实际 nameTextMapHash
-            "description": "",
             "level": level,
             "rank": data.get("rankLevel", 5),
-            "icon": "",
             "talent": [],
             "friendship": friendship_level,
             "weapon": weapon,

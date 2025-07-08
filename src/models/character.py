@@ -12,17 +12,11 @@ from src.models.weapon import Weapon
 class Character:
     """角色类"""
     # id
-    avatarId: str
-    # 名称
-    name: str
-    # 描述
-    description: str
+    avatarId: int
     # 等级
     level: int
     # 稀有度
     rank: int
-    # 图标
-    icon: str
     # 天赋
     talent: List[Stat]
     # 好感度
@@ -35,4 +29,9 @@ class Character:
     artifact_sands: Artifact
     artifact_goblet: Artifact
     artifact_circlet: Artifact
-    # 面板
+    # 名称
+    name: str = ""
+    # 图标
+    icon: str = ""
+    # 描述
+    description: str = ""
