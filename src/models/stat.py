@@ -53,3 +53,6 @@ class Stat:
     stat_type: StatType
     # 属性值
     stat_value: float
+    # 属性字符串
+    def __repr__(self):
+        return f"{self.stat_type.name}: {self.stat_value}"

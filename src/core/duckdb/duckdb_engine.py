@@ -1,8 +1,10 @@
+import os
 import uuid
+from pathlib import Path
+from typing import Any, Dict, List, Type
 
 import duckdb
-import os
-from pathlib import Path
+from duckdb import DuckDBPyConnection
 
 
 class DuckDBSession:
@@ -11,27 +13,33 @@ class DuckDBSession:
     支持从 CSV 加载数据，执行 SQL 脚本，导出结果
     """
 
-    def __init__(self, environment="dev"):
+    def __init__(self, environment: str = "dev"):
         """
         初始化 DuckDB 会话
 
-        :param db_path: DuckDB 数据库存储路径，默认为 data/main.db
+        :param environment: 环境标识符，默认为 dev
         """
-
         db_path = Path(__file__).parent.parent.parent.parent / "data" / "main.db"
         os.makedirs(db_path.parent, exist_ok=True)
         self.__conn = duckdb.connect(str(db_path))
 
-    def load_csv(self, file_path, table_name, timestamp_format, specified_types: dict = None, ignore_errors=True,
-                 nullstr=None):
+    def load_csv(self,
+                 file_path: str | Path,
+                 table_name: str,
+                 timestamp_format: str,
+                 specified_types: Dict[str, str] = None,
+                 ignore_errors: bool = True,
+                 nullstr: str = None) -> duckdb.DuckDBPyConnection:
         """
         将 CSV 文件加载到 DuckDB 中
 
-        :param timestamp_format:
-        :param ignore_errors: 是否忽略错误
-        :param specified_types: 指定列类型
         :param file_path: CSV 文件路径
-        :param table_name: 生成表名
+        :param table_name: 目标表名
+        :param timestamp_format: 时间戳格式
+        :param specified_types: 指定列类型
+        :param ignore_errors: 是否忽略错误
+        :param nullstr: NULL 值字符串
+        :return: DuckDB 连接对象
         """
         # 构造类型声明
         column_clause = ""
@@ -51,11 +59,19 @@ class DuckDBSession:
             SELECT * FROM read_csv_auto('{file_path}', timestampformat='{timestamp_format}', header=True{null_clause}{column_clause}{reject_clause})
         """
 
-        self.__conn.execute(sql)
+        return self.__conn.execute(sql)
 
-    def load_database(self, db, query_template, table_name):
+    def load_database(self,
+                      db: Dict[str, Any],
+                      query_template: str,
+                      table_name: str) -> duckdb.DuckDBPyConnection:
         """
-        MySQL/PGSQL数据 加载到 DuckDB 中
+        MySQL/PGSQL 数据加载到 DuckDB 中
+
+        :param db: 数据库连接信息字典
+        :param query_template: 查询模板
+        :param table_name: 目标表名
+        :return: DuckDB 连接对象
         """
         if not db['type'] in ['mysql', 'postgres']:
             raise ValueError(f"不支持的数据库类型：{db['type']}")
@@ -83,55 +99,68 @@ class DuckDBSession:
         """
         return self.__conn.execute(sql)
 
-    def execute_sql(self, sql):
+    def execute_sql(self, sql: str) -> duckdb.DuckDBPyConnection:
         """
         执行 SQL 查询并返回结果
 
         :param sql: SQL 查询语句
+        :return: DuckDB 连接对象
         """
         return self.__conn.execute(sql)
 
-    def register_table(self, table_object, table_name):
+    def register_table(self, table_object: Any, table_name: str) -> duckdb.DuckDBPyConnection:
         """
         将 pandas Dataframe/pyArrow Table 注册为 DuckDB 表
 
-        :param table_object: pandas Dataframe/pyArrow Table
+        :param table_object: pandas DataFrame 或 pyArrow Table
         :param table_name: 表名
+        :return: DuckDB 连接对象
         """
-        self.__conn.register(table_name, table_object)
+        return self.__conn.register(table_name, table_object)
 
-    def persist_table(self, source_table_name, target_table_name):
+    def persist_table(self, source_table_name: str, target_table_name: str) -> duckdb.DuckDBPyConnection:
         """
         将A表复制到B表
-        """
-        self.__conn.execute(f"CREATE OR REPLACE TABLE {target_table_name} AS SELECT * FROM {source_table_name}")
 
-    def save_table(self, table_object, table_name):
+        :param source_table_name: 源表名
+        :param target_table_name: 目标表名
+        :return: DuckDB 连接对象
+        """
+        return self.__conn.execute(
+            f"CREATE OR REPLACE TABLE {target_table_name} AS SELECT * FROM {source_table_name}")
+
+    def save_table(self, table_object: Any, table_name: str) -> duckdb.DuckDBPyConnection:
         """
         把数据存入 DuckDB 表
+
+        :param table_object: pandas DataFrame 或 pyArrow Table
+        :param table_name: 表名
+        :return: DuckDB 连接对象
         """
         self.register_table(table_object, "temp_df")
-        self.persist_table("temp_df", table_name)
+        return self.persist_table("temp_df", table_name)
 
-    def execute_sql_file(self, file_path):
+    def execute_sql_file(self, file_path: str | Path) -> duckdb.DuckDBPyConnection:
         """
         执行 SQL 脚本文件
 
         :param file_path: SQL 文件路径
+        :return: DuckDB 连接对象
         """
         with open(file_path, 'r', encoding='utf-8') as f:
             sql_script = f.read()
         return self.__conn.execute(sql_script)
 
-    def extract_table(self, table_name):
+    def extract_table(self, table_name: str) -> DuckDBPyConnection:
         """
-        执行 SQL 脚本文件
+        执行 SQL 查询以提取表内容
 
-        :param file_path: SQL 文件路径
+        :param table_name: 表名
+        :return: DuckDB 连接对象
         """
         return self.__conn.execute(f"SELECT * FROM {table_name}")
 
-    def close(self):
+    def close(self) -> None:
         """
         关闭 DuckDB 连接
         """

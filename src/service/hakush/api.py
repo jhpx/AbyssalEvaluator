@@ -7,7 +7,6 @@ class HakushApi:
         """
         return f"https://api.hakush.in/gi/data/character.json"
 
-
     @staticmethod
     def get_weapon_list_url() -> str:
         """
@@ -16,9 +15,8 @@ class HakushApi:
         """
         return f"https://api.hakush.in/gi/data/weapon.json"
 
-
     @staticmethod
-    def get_artifact_list_url(set_id: str) -> str:
+    def get_artifact_set_list_url() -> str:
         """
         获取玩家信息
         :param set_id: 玩家 UID
@@ -26,9 +24,9 @@ class HakushApi:
         return f"https://api.hakush.in/gi/data/artifact.json"
 
     @staticmethod
-    def get_artifact_single_url(set_id: str) -> str:
+    def get_artifact_set_single_url(set_id: int, lang: str) -> str:
         """
         获取玩家信息
         :param set_id: 玩家 UID
         """
-        return f"https://api.hakush.in/gi/data/zh/artifact/{set_id}.json"
+        return f"https://api.hakush.in/gi/data/{lang}/artifact/{set_id}.json"

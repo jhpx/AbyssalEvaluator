@@ -69,7 +69,7 @@ class EnkaParser:
         artifact_dict = {
             "id": data.get("itemId", 0),
             "name": f"TEXT_MAP_{flat_data.get('nameTextMapHash', 'UNKNOWN')}",
-            "level": reliquary_data.get("level", 0),
+            "level": reliquary_data.get("level", 1) - 1,
             "position": Position(flat_data.get("equipType", "")),
             "rank": flat_data.get("rankLevel", 0),
             "set_id": flat_data.get("setId", 0),

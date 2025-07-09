@@ -25,4 +25,3 @@ class CharacterInfo:
     name_jp: str
     # 角色的韩文名称
     name_kr: str
-    pass
