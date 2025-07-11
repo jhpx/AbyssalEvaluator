@@ -41,7 +41,6 @@ class HakushParser:
             name_kr=cdata.get("KR", ""),
         ) for cid, cdata in data.items()]
 
-
     @classmethod
     def parse_artifact_set_infos(cls, data: Dict[str, Dict]) -> List[ArtifactSetInfo]:
         artifactSetInfos = []
@@ -51,31 +50,55 @@ class HakushParser:
             desc_translations = {lang: [] for lang in ["EN", "CHS", "JP", "KR"]}
 
             for e_id, e_data in effect.items():
-                name_part = e_data.get("name", {})
-                desc_part = e_data.get("desc", {})
+                name_json = e_data.get("name", {})
+                desc_json = e_data.get("desc", {})
 
                 for lang in ["EN", "CHS", "JP", "KR"]:
                     if not name_translations[lang]:
-                        name_translations[lang] = name_part.get(lang, "")
-                    desc_translations[lang].append(desc_part.get(lang, ""))
+                        name_translations[lang] = name_json.get(lang, "")
+                    desc_translations[lang].append(desc_json.get(lang, ""))
 
+            if len(desc_translations) > 1:
+                effect_need = [2, 4]
+            else:
+                effect_need = [1]
             artifactSetInfos.append(ArtifactSetInfo(
                 id=int(aid),
                 icon=adata.get("icon", ""),
                 ranks=adata.get("rank", []),
+                effect_need=effect_need,
                 name_en=name_translations["EN"],
                 name_chs=name_translations["CHS"],
                 name_jp=name_translations["JP"],
                 name_kr=name_translations["KR"],
-                desc_en=desc_translations["EN"],
-                desc_chs=desc_translations["CHS"],
-                desc_jp=desc_translations["JP"],
-                desc_kr=desc_translations["KR"],
+                effect_desc_en=desc_translations["EN"],
+                effect_desc_chs=desc_translations["CHS"],
+                effect_desc_jp=desc_translations["JP"],
+                effect_desc_kr=desc_translations["KR"]
             ))
 
         return artifactSetInfos
 
     @classmethod
-    def parse_artifact_set_info_single(cls, data: Dict[str, Dict]) -> List[ArtifactInfo]:
+    def parse_artifact_set_info_single(cls, data: Dict[str, Dict], lang: str) -> List[ArtifactInfo]:
+        """
+        解析单个圣遗物套装详细数据（如 artifact-15003.json）
+        :param data: 包含圣遗物信息的字典
+        :param lang: 当前补完的语言
+        :return: 一套5个的ArtifactInfo 列表
+        """
         artifactInfos = []
+
+        # 从 Parts 提取各个部位
+        parts = data.get("Parts", {})
+        for part_key, part_data in parts.items():
+            # 将 part_key 映射到 Position 枚举
+            artifactInfos.append(ArtifactInfo(
+                icon=part_data.get("Icon", ""),
+                set_id=data.get("Id", 0),
+                lang=lang,
+                name=part_data.get("Name", ""),
+                desc=part_data.get("Desc", ""),
+            ))
+
         return artifactInfos

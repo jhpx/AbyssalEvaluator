@@ -4,7 +4,6 @@ from dataclasses import dataclass
 from typing import List
 
 from src.models.character import Character
-from src.models.stat import Stat
 
 
 @dataclass

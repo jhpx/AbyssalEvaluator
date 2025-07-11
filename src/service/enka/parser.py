@@ -7,8 +7,8 @@ from dacite import from_dict
 from src.models.artifact import Artifact
 from src.models.character import Character
 from src.models.player import Player
-from src.models.position import Position
-from src.models.stat import Stat, StatType
+from src.models.enum.position import Position
+from src.models.enum.stat import Stat, StatType
 from src.models.weapon import Weapon
 
 
@@ -68,12 +68,10 @@ class EnkaParser:
         # 构造参数字典
         artifact_dict = {
             "id": data.get("itemId", 0),
-            "name": f"TEXT_MAP_{flat_data.get('nameTextMapHash', 'UNKNOWN')}",
             "level": reliquary_data.get("level", 1) - 1,
             "position": Position(flat_data.get("equipType", "")),
             "rank": flat_data.get("rankLevel", 0),
             "set_id": flat_data.get("setId", 0),
-            "set_name": f"TEXT_MAP_{flat_data.get('setNameTextMapHash', 'UNKNOWN')}",
             "icon": flat_data.get("icon", ""),
             "main_stat_id": reliquary_data.get("mainPropId"),
             "sub_stat_ids": reliquary_data.get("appendPropIdList"),
@@ -85,6 +83,7 @@ class EnkaParser:
 
     @staticmethod
     def parse_equip_item(data: Dict) -> Artifact | Weapon | None:
+        """解析圣遗物装备或武器装备"""
         if data.get("reliquary"):
             return EnkaParser.parse_artifact(data)
         elif data.get("weapon"):

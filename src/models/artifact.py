@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 from typing import List
 
-from src.models.position import Position
+from src.models.enum.position import Position
 # artifact.py
 
-from src.models.stat import Stat
+from src.models.enum.stat import Stat
 
 
 @dataclass
@@ -12,12 +12,8 @@ class Artifact:
     """圣遗物类"""
     # ID
     id: int
-    # 名称
-    name: str
-    # 系列ID
+    # 套装ID
     set_id: int
-    # 系列Name
-    set_name: str
     # 等级
     level: int
     # 装备位置
@@ -34,3 +30,7 @@ class Artifact:
     main_stat: Stat
     # 副属性
     sub_stats: List[Stat]
+    # 名称
+    name: str = ""
+    # 套装名称
+    set_name: str = ""

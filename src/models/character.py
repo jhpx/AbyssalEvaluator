@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import List
 
 from src.models.artifact import Artifact
-from src.models.stat import Stat
+from src.models.enum.stat import Stat
 from src.models.weapon import Weapon
 
 

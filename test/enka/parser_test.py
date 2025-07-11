@@ -6,8 +6,8 @@ import json
 from src.models.artifact import Artifact
 from src.models.character import Character
 from src.models.player import Player
-from src.models.position import Position
-from src.models.stat import Stat, StatType
+from src.models.enum.position import Position
+from src.models.enum.stat import Stat, StatType
 from src.models.weapon import Weapon
 from src.service.enka.parser import EnkaParser
 

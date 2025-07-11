@@ -1,10 +1,9 @@
 import os
 import uuid
 from pathlib import Path
-from typing import Any, Dict, List, Type
+from typing import Any, Dict
 
 import duckdb
-from duckdb import DuckDBPyConnection
 
 
 class DuckDBSession:
@@ -129,9 +128,20 @@ class DuckDBSession:
         return self.__conn.execute(
             f"CREATE OR REPLACE TABLE {target_table_name} AS SELECT * FROM {source_table_name}")
 
+    def table_exists(self, table_name: str) -> bool:
+        """
+        检查表是否存在
+
+        :param table_name: 表名
+        :return: 表是否存在
+        """
+        result = self.__conn.execute(
+            f"SELECT EXISTS(SELECT 1 FROM information_schema.tables WHERE table_name='{table_name}')").fetchone()
+        return result[0]
+
     def save_table(self, table_object: Any, table_name: str) -> duckdb.DuckDBPyConnection:
         """
-        把数据存入 DuckDB 表
+        把数据覆盖存入 DuckDB 表
 
         :param table_object: pandas DataFrame 或 pyArrow Table
         :param table_name: 表名
@@ -139,6 +149,22 @@ class DuckDBSession:
         """
         self.register_table(table_object, "temp_df")
         return self.persist_table("temp_df", table_name)
+
+    def upsert_table(self, table_object: Any, table_name: str, id_col: str) -> duckdb.DuckDBPyConnection:
+        """
+        把数据追加存入 DuckDB 表
+
+        :param id_col:
+        :param table_object: pandas DataFrame 或 pyArrow Table
+        :param table_name: 表名
+        :return: DuckDB 连接对象
+        """
+        self.register_table(table_object, "temp_df")
+        if self.table_exists(table_name):
+            return self.__conn.execute(
+                f"INSERT INTO {table_name} SELECT * FROM temp_df ON CONFLICT({id_col}) DO NOTHING")
+        else:
+            return self.persist_table("temp_df", table_name)
 
     def execute_sql_file(self, file_path: str | Path) -> duckdb.DuckDBPyConnection:
         """
@@ -151,14 +177,17 @@ class DuckDBSession:
             sql_script = f.read()
         return self.__conn.execute(sql_script)
 
-    def extract_table(self, table_name: str) -> DuckDBPyConnection:
+    def extract_table(self, table_name: str) -> duckdb.DuckDBPyRelation:
         """
         执行 SQL 查询以提取表内容
 
         :param table_name: 表名
         :return: DuckDB 连接对象
         """
-        return self.__conn.execute(f"SELECT * FROM {table_name}")
+        if self.table_exists(table_name):
+            return self.__conn.table(table_name)
+        else:
+            return self.__conn.sql("SELECT 1 WHERE 1<>1")
 
     def close(self) -> None:
         """

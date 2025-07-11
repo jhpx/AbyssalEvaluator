@@ -47,8 +47,8 @@ async def sync_player(client: httpx.AsyncClient, uid: str):
         # artifact_info_rows = duckdb_session.extract_table("ods_artifact_info")
         # artifact_dict = rows_into_model_dict(artifact_info_rows, ArtifactInfo)
         for character in player.characters:
-            weapon_info = weapon_dict.get(character.weapon.id)
-            character_info = character_dict.get(character.avatarId)
+            weapon_info = weapon_dict.get(character.weapon.id, None)
+            character_info = character_dict.get(character.avatarId, None)
             character.name = character_info.name_chs if character_info else "未知角色"
             character.icon = character_info.icon if character_info else "未知图标"
             character.weapon.name = weapon_info.name_chs if weapon_info else "未知武器"
@@ -69,10 +69,13 @@ def print_player(player: Player):
         print(f"   等级: {character.level}")
         print(f"   好感度: {character.friendship}")
         wp = character.weapon
-        print(f"   武器: {wp.name}(ID: {wp.id}|{wp.icon}) (类型: {wp.type}) (等级: {wp.level}) (精炼: {wp.refine}) (效果: {wp.weapon_stats})")
-        for aft in [character.artifact_flower, character.artifact_plume, character.artifact_sands, character.artifact_goblet, character.artifact_circlet]:
+        print(
+            f"   武器: {wp.name}(ID: {wp.id}|{wp.icon}) (类型: {wp.type}) (等级: {wp.level}) (精炼: {wp.refine}) (效果: {wp.weapon_stats})")
+        for aft in [character.artifact_flower, character.artifact_plume, character.artifact_sands,
+                    character.artifact_goblet, character.artifact_circlet]:
             if aft:
-                print(f"   圣遗物{aft.position}(套装:{aft.set_name}): {aft.name}({aft.id}|{aft.icon}) (等级: {aft.level}) (效果: {aft.main_stat},{aft.sub_stats})")
+                print(
+                    f"   圣遗物{aft.position}(套装:{aft.set_name}): {aft.name}({aft.id}|{aft.icon}) (等级: {aft.level}) (效果: {aft.main_stat},{aft.sub_stats})")
 
 
 async def main():
@@ -80,4 +83,3 @@ async def main():
     async with httpx.AsyncClient(proxy="http://127.0.0.1:4081") as client:
         async with anyio.create_task_group() as tg:
             tg.start_soon(sync_player, client, uid)
-
