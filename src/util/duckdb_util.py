@@ -1,4 +1,4 @@
-from typing import Type, Dict, TypeVar, List
+from typing import Type, Dict, TypeVar, List, Any
 
 from duckdb import DuckDBPyConnection
 from duckdb.duckdb import DuckDBPyRelation
@@ -7,7 +7,7 @@ from duckdb.duckdb import DuckDBPyRelation
 T = TypeVar('T')
 
 
-def rows_into_model_dict(db_relation: DuckDBPyRelation, model_class: Type[T]) -> Dict[int, T]:
+def rows_into_model_dict(db_relation: DuckDBPyRelation, model_class: Type[T]) -> Dict[Any, T]:
     """
     将查询结果映射为指定类型的对象字典
 

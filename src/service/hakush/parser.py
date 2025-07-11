@@ -16,9 +16,9 @@ class HakushParser:
             rank=wdata.get("rank", 0),
             type=wdata.get("type", ""),
             name_en=wdata.get("EN", ""),
-            name_chs=wdata.get("CHS", ""),
-            name_jp=wdata.get("JP", ""),
-            name_kr=wdata.get("KR", ""),
+            name_zh=wdata.get("CHS", ""),
+            name_ja=wdata.get("JP", ""),
+            name_ko=wdata.get("KR", ""),
         ) for wid, wdata in data.items()]
 
     @classmethod
@@ -36,9 +36,9 @@ class HakushParser:
             birth=cdata.get("birth", []),
             release=cdata.get("release", ""),
             name_en=cdata.get("EN", ""),
-            name_chs=cdata.get("CHS", ""),
-            name_jp=cdata.get("JP", ""),
-            name_kr=cdata.get("KR", ""),
+            name_zh=cdata.get("CHS", ""),
+            name_ja=cdata.get("JP", ""),
+            name_ko=cdata.get("KR", ""),
         ) for cid, cdata in data.items()]
 
     @classmethod
@@ -68,13 +68,13 @@ class HakushParser:
                 ranks=adata.get("rank", []),
                 effect_need=effect_need,
                 name_en=name_translations["EN"],
-                name_chs=name_translations["CHS"],
-                name_jp=name_translations["JP"],
-                name_kr=name_translations["KR"],
+                name_zh=name_translations["CHS"],
+                name_ja=name_translations["JP"],
+                name_ko=name_translations["KR"],
                 effect_desc_en=desc_translations["EN"],
-                effect_desc_chs=desc_translations["CHS"],
-                effect_desc_jp=desc_translations["JP"],
-                effect_desc_kr=desc_translations["KR"]
+                effect_desc_zh=desc_translations["CHS"],
+                effect_desc_ja=desc_translations["JP"],
+                effect_desc_ko=desc_translations["KR"]
             ))
 
         return artifactSetInfos

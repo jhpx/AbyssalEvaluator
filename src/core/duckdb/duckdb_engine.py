@@ -98,15 +98,6 @@ class DuckDBSession:
         """
         return self.__conn.execute(sql)
 
-    def execute_sql(self, sql: str) -> duckdb.DuckDBPyConnection:
-        """
-        执行 SQL 查询并返回结果
-
-        :param sql: SQL 查询语句
-        :return: DuckDB 连接对象
-        """
-        return self.__conn.execute(sql)
-
     def register_table(self, table_object: Any, table_name: str) -> duckdb.DuckDBPyConnection:
         """
         将 pandas Dataframe/pyArrow Table 注册为 DuckDB 表
@@ -117,7 +108,8 @@ class DuckDBSession:
         """
         return self.__conn.register(table_name, table_object)
 
-    def persist_table(self, source_table_name: str, target_table_name: str) -> duckdb.DuckDBPyConnection:
+    def persist_table(self, source_table_name: str, target_table_name: str,
+                      pk_column: str = "id") -> duckdb.DuckDBPyConnection:
         """
         将A表复制到B表
 
@@ -125,8 +117,11 @@ class DuckDBSession:
         :param target_table_name: 目标表名
         :return: DuckDB 连接对象
         """
-        return self.__conn.execute(
+        self.__conn.execute(
             f"CREATE OR REPLACE TABLE {target_table_name} AS SELECT * FROM {source_table_name}")
+        self.__conn.execute(f"ALTER TABLE {target_table_name} ADD PRIMARY KEY ({pk_column})")
+
+        return self.__conn
 
     def table_exists(self, table_name: str) -> bool:
         """
@@ -139,6 +134,13 @@ class DuckDBSession:
             f"SELECT EXISTS(SELECT 1 FROM information_schema.tables WHERE table_name='{table_name}')").fetchone()
         return result[0]
 
+    def primary_key_exists(self,table_name: str) -> bool:
+        result = self.__conn.execute(f"PRAGMA table_info('{table_name}')").fetchall()
+        for col in result:
+            if len(col) >= 6 and col[5] == 1:  # 第6列是 'pk' 字段
+                return True
+        return False
+
     def save_table(self, table_object: Any, table_name: str) -> duckdb.DuckDBPyConnection:
         """
         把数据覆盖存入 DuckDB 表
@@ -150,21 +152,34 @@ class DuckDBSession:
         self.register_table(table_object, "temp_df")
         return self.persist_table("temp_df", table_name)
 
-    def upsert_table(self, table_object: Any, table_name: str, id_col: str) -> duckdb.DuckDBPyConnection:
+
+
+    def upsert_table(self, table_object: Any, table_name: str, pk_column: str) -> duckdb.DuckDBPyConnection:
         """
         把数据追加存入 DuckDB 表
 
-        :param id_col:
+        :param pk_column:
         :param table_object: pandas DataFrame 或 pyArrow Table
         :param table_name: 表名
         :return: DuckDB 连接对象
         """
         self.register_table(table_object, "temp_df")
         if self.table_exists(table_name):
+            if not self.primary_key_exists(table_name):
+                self.__conn.execute(f"ALTER TABLE {table_name} ADD PRIMARY KEY ({pk_column})")
             return self.__conn.execute(
-                f"INSERT INTO {table_name} SELECT * FROM temp_df ON CONFLICT({id_col}) DO NOTHING")
+                f"INSERT INTO {table_name} SELECT * FROM temp_df ON CONFLICT({pk_column}) DO NOTHING")
         else:
-            return self.persist_table("temp_df", table_name)
+            return self.persist_table("temp_df", table_name, pk_column)
+
+    def execute_sql(self, sql: str) -> duckdb.DuckDBPyConnection:
+        """
+        执行 SQL 查询并返回结果
+
+        :param sql: SQL 查询语句
+        :return: DuckDB 连接对象
+        """
+        return self.__conn.execute(sql)
 
     def execute_sql_file(self, file_path: str | Path) -> duckdb.DuckDBPyConnection:
         """
@@ -188,6 +203,14 @@ class DuckDBSession:
             return self.__conn.table(table_name)
         else:
             return self.__conn.sql("SELECT 1 WHERE 1<>1")
+
+    def sql(self, sql, *args, **kwargs) -> duckdb.DuckDBPyRelation:
+        """
+        执行 SQL 查询并返回结果
+        :param sql: SQL 查询语句
+        :return: DuckDB 连接对象
+        """
+        return self.__conn.sql(sql, *args, **kwargs)
 
     def close(self) -> None:
         """
