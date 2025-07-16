@@ -1,19 +1,19 @@
+import pickle
+
+import httpx
+
 from src.core.duckdb.duckdb_engine import DuckDBSession
 from src.models.meta.artifact_info import ArtifactInfo
-from src.util.duckdb_util import rows_into_model_dict
 from src.models.meta.character_info import CharacterInfo
 from src.models.meta.weapon_info import WeaponInfo
 from src.models.player import Player
-from src.util.logger import logger
-import httpx
-import anyio
-
 from src.service.enka.api import EnkaApi
 from src.service.enka.parser import EnkaParser
-from src.util.http_util import fetch_local_json, fetch_and_parse
+from src.util.duckdb_util import rows_into_model_dict
+from src.util.http_util import fetch_and_parse
 
 
-async def sync_player(client: httpx.AsyncClient, uid: str):
+async def sync_player(client: httpx.AsyncClient, uid: str) -> Player:
     """
     获取并解析玩家信息，输出到控制台
 
@@ -24,13 +24,15 @@ async def sync_player(client: httpx.AsyncClient, uid: str):
         client=client,
         url=EnkaApi.get_player_url(uid),
         parser=EnkaParser.parse_player,
-        use_local=True,
+        use_local=False,
         local_file_path="test\\enka\\json\\player.json"
     )
 
     if player:
-        await compose_player(player,'ko')
-        print_player(player)
+        await compose_player(player, 'zh')
+        with open(f"data\\player\\{player.uid}.pkl", "wb") as f:
+            pickle.dump(player, f)
+    return player
 
 
 async def compose_player(player: Player, lang: str):
@@ -63,29 +65,9 @@ async def compose_player(player: Player, lang: str):
         character.artifact_circlet.name = artifact_info_circlet.name if artifact_info_circlet else "UNKNOWN"
 
 
-def print_player(player: Player):
-    print(f"\n[UID={player.uid}]{player.nickname} 的角色信息如下：")
-    print(f"等级: {player.level}")
-    print(f"世界等级: {player.world_level}")
-    print(f"成就数量: {player.finish_achievement_num}")
-    print(f"深境螺旋: 第{player.tower_floor_index}层 第{player.tower_level_index}间")
-    print(f"满好感角色数量: {player.full_friendship_num}")
-    for idx, character in enumerate(player.characters, 1):
-        print(f"\n{idx}. {character.name}(ID: {character.avatarId}|{character.icon})")
-        print(f"   等级: {character.level}")
-        print(f"   好感度: {character.friendship}")
-        wp = character.weapon
-        print(
-            f"   武器: {wp.name}(ID: {wp.id}|{wp.icon}) (类型: {wp.type}) (等级: {wp.level}) (精炼: {wp.refine}) (效果: {wp.weapon_stats})")
-        for aft in [character.artifact_flower, character.artifact_plume, character.artifact_sands,
-                    character.artifact_goblet, character.artifact_circlet]:
-            if aft:
-                print(
-                    f"   圣遗物{aft.position}(套装:{aft.set_name}): {aft.name}({aft.id}|{aft.icon}) (等级: {aft.level}) (效果: {aft.main_stat},{aft.sub_stats})")
 
 
 async def main():
     uid = "101242308"
     async with httpx.AsyncClient(proxy="http://127.0.0.1:4081") as client:
-        async with anyio.create_task_group() as tg:
-            tg.start_soon(sync_player, client, uid)
+        return await sync_player(client, uid)

@@ -15,6 +15,7 @@ from src.util.logger import logger
 
 T = TypeVar("T")
 
+
 async def sync_generic(
         client: httpx.AsyncClient,
         url: str,
@@ -184,4 +185,5 @@ async def main():
             tg.start_soon(sync_weapon, client)
             tg.start_soon(sync_character, client)
             tg.start_soon(sync_artifact_set, client)
-            tg.start_soon(sync_artifact_set_details, client)
+
+        await sync_artifact_set_details(client)
