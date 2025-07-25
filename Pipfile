@@ -9,6 +9,7 @@ duckdb = "*"
 starlette = "*"
 httpx = "*"
 pyarrow = "*"
+pipdeptree = "*"
 
 [dev-packages]
 

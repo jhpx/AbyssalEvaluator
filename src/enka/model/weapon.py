@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from typing import List
 
-from src.models.enum.stat import Stat
+from src.enka.model.stat import Stat
 
 
 @dataclass

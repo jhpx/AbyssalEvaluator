@@ -6,9 +6,9 @@ from src.core.duckdb.duckdb_engine import DuckDBSession
 from src.models.meta.artifact_info import ArtifactInfo
 from src.models.meta.character_info import CharacterInfo
 from src.models.meta.weapon_info import WeaponInfo
-from src.models.player import Player
-from src.service.enka.api import EnkaApi
-from src.service.enka.parser import EnkaParser
+from src.enka.model.player import Player
+from src.enka.api import EnkaApi
+from src.enka.stage.parser import EnkaParser
 from src.util.duckdb_util import rows_into_model_dict
 from src.util.http_util import fetch_and_parse
 

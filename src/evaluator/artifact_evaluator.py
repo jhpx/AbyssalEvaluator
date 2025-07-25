@@ -1,8 +1,7 @@
 # artifact_weight.py
-import httpx
 
-from src.models.artifact import Artifact
-from src.models.enum.stat import StatType
+from src.enka.model.artifact import Artifact
+from src.enka.model.stat import StatType
 
 # 定义每个圣遗物词条的系数（小助手公式）
 XZS_ARTIFACT_STAT_FACTORS = {
@@ -15,7 +14,7 @@ XZS_ARTIFACT_STAT_FACTORS = {
     StatType.HP: 0.026 * 0.66,  # 生命值 0.01716
     StatType.DEF: 0.335 * 0.66,  # 防御力 0.2211
     StatType.ELEMENTAL_MASTERY: 0.33,  # 元素精通
-    StatType.ENERGY_RECHARGE: 1.1979,  # 充能效率
+    StatType.ELEMENTAL_CHARGE: 1.1979,  # 充能效率
 }
 
 # 定义每个圣遗物词条的系数（刻晴办公桌公式）
@@ -29,7 +28,7 @@ KEQING_ARTIFACT_STAT_FACTORS = {
     StatType.HP: 0.012995,  # 生命值
     StatType.DEF: 0.162676,  # 防御力
     StatType.ELEMENTAL_MASTERY: 0.332857,  # 元素精通
-    StatType.ENERGY_RECHARGE: 1.197943,  # 充能效率
+    StatType.ELEMENTAL_CHARGE: 1.197943,  # 充能效率
 }
 
 CHARACTER_STAT_WEIGHTS = {
@@ -39,7 +38,7 @@ CHARACTER_STAT_WEIGHTS = {
     StatType.DEF_PERCENT: 1,  # 防御百分比
     StatType.ATK: 0.5,  # 攻击力
     StatType.DEF: 1,  # 防御力
-    StatType.ENERGY_RECHARGE: 0.55,  # 充能效率
+    StatType.ELEMENTAL_CHARGE: 0.55,  # 充能效率
 }
 
 

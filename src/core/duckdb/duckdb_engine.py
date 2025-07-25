@@ -119,8 +119,10 @@ class DuckDBSession:
         """
         self.__conn.execute(
             f"CREATE OR REPLACE TABLE {target_table_name} AS SELECT * FROM {source_table_name}")
-        self.__conn.execute(f"ALTER TABLE {target_table_name} ADD PRIMARY KEY ({pk_column})")
-
+        try:
+            self.__conn.execute(f"ALTER TABLE {target_table_name} ADD PRIMARY KEY ({pk_column})")
+        except duckdb.CatalogException:
+            pass
         return self.__conn
 
     def table_exists(self, table_name: str) -> bool:
@@ -134,7 +136,7 @@ class DuckDBSession:
             f"SELECT EXISTS(SELECT 1 FROM information_schema.tables WHERE table_name='{table_name}')").fetchone()
         return result[0]
 
-    def primary_key_exists(self,table_name: str) -> bool:
+    def primary_key_exists(self, table_name: str) -> bool:
         result = self.__conn.execute(f"PRAGMA table_info('{table_name}')").fetchall()
         for col in result:
             if len(col) >= 6 and col[5] == 1:  # 第6列是 'pk' 字段
@@ -151,8 +153,6 @@ class DuckDBSession:
         """
         self.register_table(table_object, "temp_df")
         return self.persist_table("temp_df", table_name)
-
-
 
     def upsert_table(self, table_object: Any, table_name: str, pk_column: str) -> duckdb.DuckDBPyConnection:
         """
@@ -172,14 +172,15 @@ class DuckDBSession:
         else:
             return self.persist_table("temp_df", table_name, pk_column)
 
-    def execute_sql(self, sql: str) -> duckdb.DuckDBPyConnection:
+    def execute_sql(self, sql: str, parameters=None) -> duckdb.DuckDBPyConnection:
         """
         执行 SQL 查询并返回结果
 
+        :param parameters:
         :param sql: SQL 查询语句
         :return: DuckDB 连接对象
         """
-        return self.__conn.execute(sql)
+        return self.__conn.execute(sql, parameters)
 
     def execute_sql_file(self, file_path: str | Path) -> duckdb.DuckDBPyConnection:
         """

@@ -1,10 +1,9 @@
+# artifact.py
 from dataclasses import dataclass
 from typing import List
 
-from src.models.enum.position import Position
-# artifact.py
-
-from src.models.enum.stat import Stat, StatType
+from src.enka.model.stat import Stat, StatType
+from src.enka.config.constants import EquipmentType
 
 
 @dataclass
@@ -17,7 +16,7 @@ class Artifact:
     # 等级
     level: int
     # 装备位置
-    position: Position
+    equipment_type: EquipmentType
     # 稀有度
     rank: int
     # 图标

@@ -11,13 +11,20 @@ T = TypeVar("T")
 async def fetch_and_parse(
         client: httpx.AsyncClient,
         url: str,
-        parser: Callable[[dict], T|List[T]],
-        use_local: bool = True,
-        local_file_path: str = None):
-    if use_local and local_file_path:
-        raw_data = await fetch_local_json(local_file_path)
-    else:
+        parser: Callable[[dict], T | List[T]]):
+    """
+    获取并解析数据
+
+    :param client: httpx.AsyncClient 实例
+    :param url: 请求的URL或本地文件路径
+    :param parser: 解析函数
+    :return: 解析后的数据或 None
+    """
+    # 根据URL协议类型决定使用哪种方式获取数据
+    if url.startswith("http"):
         raw_data = await fetch_http_json(client, url)
+    else:
+        raw_data = await fetch_local_json(url)
 
     if not raw_data:
         logger.error(f"无法获取数据:{url}")
@@ -31,6 +38,7 @@ async def fetch_and_parse(
 
 
 async def fetch_http_json(client: httpx.AsyncClient, url: str) -> Dict:
+    logger.info(f"使用远端网络地址: {url}")
     try:
         response = await client.get(url, timeout=100)
         response.raise_for_status()
@@ -42,6 +50,7 @@ async def fetch_http_json(client: httpx.AsyncClient, url: str) -> Dict:
 
 
 async def fetch_local_json(file_path: str) -> Dict:
+    logger.info(f"使用本地文件地址: {file_path}")
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
             return json.load(f)

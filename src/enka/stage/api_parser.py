@@ -1,21 +1,19 @@
 # parser.py
 
-from typing import Dict
-
 from dacite import from_dict
 
-from src.models.artifact import Artifact
-from src.models.character import Character
-from src.models.player import Player
-from src.models.enum.position import Position
-from src.models.enum.stat import Stat, StatType
-from src.models.weapon import Weapon
+from src.enka.model.artifact import Artifact
+from src.enka.model.character import Character
+from src.enka.model.player import Player
+from src.enka.model.stat import Stat, StatType
+from src.enka.model.weapon import Weapon
+from src.enka.config.constants import EquipmentType
 
 
 class EnkaParser:
 
     @staticmethod
-    def parse_weapon(data: Dict) -> Weapon:
+    def parse_weapon(data: dict) -> Weapon:
         """解析武器装备"""
         weapon_data = data.get("weapon", {})
         flat_data = data.get("flat", {})
@@ -46,7 +44,7 @@ class EnkaParser:
         return from_dict(data_class=Weapon, data=weapon_dict)
 
     @staticmethod
-    def parse_artifact(data: Dict) -> Artifact:
+    def parse_artifact(data: dict) -> Artifact:
         """解析圣遗物装备"""
         reliquary_data = data.get("reliquary", {})
         flat_data = data.get("flat", {})
@@ -69,7 +67,7 @@ class EnkaParser:
         artifact_dict = {
             "id": data.get("itemId", 0),
             "level": reliquary_data.get("level", 1) - 1,
-            "position": Position(flat_data.get("equipType", "")),
+            "equipment_type": EquipmentType(flat_data.get("equipType", "")),
             "rank": flat_data.get("rankLevel", 0),
             "set_id": flat_data.get("setId", 0),
             "icon": flat_data.get("icon", ""),
@@ -82,7 +80,7 @@ class EnkaParser:
         return from_dict(data_class=Artifact, data=artifact_dict)
 
     @staticmethod
-    def parse_equip_item(data: Dict) -> Artifact | Weapon | None:
+    def parse_equip_item(data: dict) -> Artifact | Weapon | None:
         """解析圣遗物装备或武器装备"""
         if data.get("reliquary"):
             return EnkaParser.parse_artifact(data)
@@ -92,7 +90,7 @@ class EnkaParser:
             return None
 
     @staticmethod
-    def parse_character(data: Dict) -> Character:
+    def parse_character(data: dict) -> Character:
         """
         解析角色信息
         :param data: 包含角色信息的字典
@@ -125,7 +123,7 @@ class EnkaParser:
             if isinstance(parsed_item, Weapon):
                 weapon = parsed_item
             elif isinstance(parsed_item, Artifact):
-                artifact_map[parsed_item.position] = parsed_item
+                artifact_map[parsed_item.equipment_type] = parsed_item
 
         # 构造参数字典
         character_dict = {
@@ -135,17 +133,17 @@ class EnkaParser:
             "talent": [],
             "friendship": friendship_level,
             "weapon": weapon,
-            "artifact_flower": artifact_map[Position.FLOWER],
-            "artifact_plume": artifact_map[Position.PLUME],
-            "artifact_sands": artifact_map[Position.SANDS],
-            "artifact_goblet": artifact_map[Position.GOBLET],
-            "artifact_circlet": artifact_map[Position.CIRCLET],
+            "artifact_flower": artifact_map[EquipmentType.FLOWER],
+            "artifact_plume": artifact_map[EquipmentType.PLUME],
+            "artifact_sands": artifact_map[EquipmentType.SANDS],
+            "artifact_goblet": artifact_map[EquipmentType.GOBLET],
+            "artifact_circlet": artifact_map[EquipmentType.CIRCLET],
         }
 
         return from_dict(data_class=Character, data=character_dict)
 
     @staticmethod
-    def parse_player(data: Dict) -> Player:
+    def parse_player(data: dict) -> Player:
         """解析玩家信息"""
         player_data = data.get("playerInfo", {})
 

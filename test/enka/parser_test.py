@@ -3,13 +3,13 @@
 import unittest
 
 import json
-from src.models.artifact import Artifact
-from src.models.character import Character
-from src.models.player import Player
+from src.enka.model.artifact import Artifact
+from src.enka.model.character import Character
+from src.enka.model.player import Player
 from src.models.enum.position import Position
-from src.models.enum.stat import Stat, StatType
-from src.models.weapon import Weapon
-from src.service.enka.parser import EnkaParser
+from src.enka.model.stat import Stat, StatType
+from src.enka.model.weapon import Weapon
+from src.enka.stage.parser import EnkaParser
 
 
 class TestEnkaParser(unittest.TestCase):

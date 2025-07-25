@@ -156,27 +156,7 @@ async def sync_character(client: httpx.AsyncClient):
     )
 
 
-def sync_duckdb(items: List[dataclass], table_name: str, duckdb_session: DuckDBSession,
-                pk_column: str = "id",
-                overwrite: bool = True):
-    """
-    将实体类列表同步到 DuckDB 表中
 
-    :param pk_column: 主键
-    :param overwrite: 是否覆盖
-    :param items: 实体类对象列表（支持 dataclass 或 pydantic 模型）
-    :param table_name: DuckDB 中目标表名
-    :param duckdb_session: 已有的 DuckDB 会话实例
-    """
-    if not items:
-        return
-
-    # 转换为字典列表
-    df = pa.Table.from_pylist([asdict(item) for item in items])
-    if overwrite:
-        duckdb_session.save_table(df, table_name)
-    else:
-        duckdb_session.upsert_table(df, table_name, pk_column)
 
 
 async def main():

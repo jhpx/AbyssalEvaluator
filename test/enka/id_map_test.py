@@ -2,10 +2,10 @@ import unittest
 from pathlib import Path
 
 import json
-from src.models.artifact import Artifact
-from src.models.weapon import Weapon
-from src.service.enka.parser import EnkaParser
-from src.service.enka.prop_id_map import ID_MAP, SUB_ID_MAP
+from src.enka.model.artifact import Artifact
+from src.enka.model.weapon import Weapon
+from src.enka.stage.parser import EnkaParser
+from src.enka.config.prop_id_map import ID_MAP, SUB_ID_MAP
 
 
 class TestIDMap(unittest.TestCase):
