@@ -19,7 +19,10 @@ def rows_into_model_dict(db_relation: DuckDBPyRelation, model_class: Type[T]) ->
     :return: 对象字典
     """
     model_rows = db_relation.fetchall()
-    return {r[0]: model_class(*r) for r in model_rows}
+    if model_class in {str, int}:
+        return {r[0]: r[1] for r in model_rows}
+    else:
+        return {r[0]: model_class(*r) for r in model_rows}
 
 
 def rows_into_model_list(db_relation: DuckDBPyRelation, model_class: Type[T]) -> List[T]:
@@ -31,6 +34,8 @@ def rows_into_model_list(db_relation: DuckDBPyRelation, model_class: Type[T]) ->
     :return: 对象列表
     """
     model_rows = db_relation.fetchall()
+    if model_class in {str, int}:
+        return [r[1] for r in model_rows]
     return [model_class(*r) for r in model_rows]
 
 

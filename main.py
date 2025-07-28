@@ -11,9 +11,13 @@ from src.enka.client import EnkaClient
 
 
 async def main() -> None:
-    async with EnkaClient("en",proxy="http://127.0.0.1:4081") as api:
+    async with EnkaClient("zh-cn",proxy="http://127.0.0.1:4081") as api:
         # Update assets
         await api.fetch_assets()
+        a = await api.get_asset("pfp")
+        #await api.fetch_player("101242308")
+
+        print(a)
     return None
 
 # async def run_tasks():

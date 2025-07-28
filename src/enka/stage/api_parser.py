@@ -13,7 +13,7 @@ from src.enka.config.constants import EquipmentType
 class EnkaParser:
 
     @staticmethod
-    def parse_weapon(data: dict) -> Weapon:
+    def parse_weapon(data: dict, asset_map: dict) -> Weapon:
         """解析武器装备"""
         weapon_data = data.get("weapon", {})
         flat_data = data.get("flat", {})
@@ -44,7 +44,7 @@ class EnkaParser:
         return from_dict(data_class=Weapon, data=weapon_dict)
 
     @staticmethod
-    def parse_artifact(data: dict) -> Artifact:
+    def parse_artifact(data: dict, asset_map: dict) -> Artifact:
         """解析圣遗物装备"""
         reliquary_data = data.get("reliquary", {})
         flat_data = data.get("flat", {})
@@ -80,17 +80,17 @@ class EnkaParser:
         return from_dict(data_class=Artifact, data=artifact_dict)
 
     @staticmethod
-    def parse_equip_item(data: dict) -> Artifact | Weapon | None:
+    def parse_equip_item(data: dict, asset_map: dict) -> Artifact | Weapon | None:
         """解析圣遗物装备或武器装备"""
         if data.get("reliquary"):
-            return EnkaParser.parse_artifact(data)
+            return EnkaParser.parse_artifact(data, asset_map)
         elif data.get("weapon"):
-            return EnkaParser.parse_weapon(data)
+            return EnkaParser.parse_weapon(data, asset_map)
         else:
             return None
 
     @staticmethod
-    def parse_character(data: dict) -> Character:
+    def parse_character(data: dict, asset_map: dict) -> Character:
         """
         解析角色信息
         :param data: 包含角色信息的字典
@@ -143,7 +143,7 @@ class EnkaParser:
         return from_dict(data_class=Character, data=character_dict)
 
     @staticmethod
-    def parse_player(data: dict) -> Player:
+    def parse_player(data: dict, asset_map: dict) -> Player:
         """解析玩家信息"""
         player_data = data.get("playerInfo", {})
 
