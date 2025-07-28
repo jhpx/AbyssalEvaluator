@@ -113,6 +113,7 @@ class DuckDBSession:
         """
         将A表复制到B表
 
+        :param pk_column: 主键
         :param source_table_name: 源表名
         :param target_table_name: 目标表名
         :return: DuckDB 连接对象
@@ -136,23 +137,37 @@ class DuckDBSession:
             f"SELECT EXISTS(SELECT 1 FROM information_schema.tables WHERE table_name='{table_name}')").fetchone()
         return result[0]
 
-    def primary_key_exists(self, table_name: str) -> bool:
+    def get_primary_key_columns(self, table_name: str) -> list[str]:
+        """
+        获取表的主键列名列表
+
+        :param table_name: 表名
+        :return: 主键列名列表
+        """
         result = self.__conn.execute(f"PRAGMA table_info('{table_name}')").fetchall()
+        primary_keys = []
         for col in result:
             if len(col) >= 6 and col[5] == 1:  # 第6列是 'pk' 字段
-                return True
-        return False
+                primary_keys.append(col[1])  # 第2列是列名
+        return primary_keys
 
-    def save_table(self, table_object: Any, table_name: str) -> duckdb.DuckDBPyConnection:
+    def save_table(self, table_object: Any, table_name: str, pk_column: str = "id") -> duckdb.DuckDBPyConnection:
         """
         把数据覆盖存入 DuckDB 表
 
+        :param pk_column:  主键
         :param table_object: pandas DataFrame 或 pyArrow Table
         :param table_name: 表名
         :return: DuckDB 连接对象
         """
-        self.register_table(table_object, "temp_df")
-        return self.persist_table("temp_df", table_name)
+        if isinstance(table_object, dict):
+            self.__conn.execute(
+                f"CREATE OR REPLACE TABLE {table_name} ({pk_column} VARCHAR PRIMARY KEY, value VARCHAR)")
+            return self.__conn.executemany(f"INSERT OR REPLACE INTO {table_name} VALUES (?, ?)",
+                                           list(table_object.items()))
+        else:
+            self.register_table(table_object, "temp_df")
+            return self.persist_table("temp_df", table_name, pk_column)
 
     def upsert_table(self, table_object: Any, table_name: str, pk_column: str) -> duckdb.DuckDBPyConnection:
         """
@@ -163,14 +178,18 @@ class DuckDBSession:
         :param table_name: 表名
         :return: DuckDB 连接对象
         """
-        self.register_table(table_object, "temp_df")
         if self.table_exists(table_name):
-            if not self.primary_key_exists(table_name):
+            if not self.get_primary_key_columns(table_name):
                 self.__conn.execute(f"ALTER TABLE {table_name} ADD PRIMARY KEY ({pk_column})")
-            return self.__conn.execute(
-                f"INSERT INTO {table_name} SELECT * FROM temp_df ON CONFLICT({pk_column}) DO NOTHING")
+            if isinstance(table_object, dict):
+                return self.__conn.executemany(f"INSERT OR REPLACE INTO {table_name} VALUES (?, ?)",
+                                               list(table_object.items()))
+            else:
+                self.register_table(table_object, "temp_df")
+                return self.__conn.execute(
+                    f"INSERT OR REPLACE INTO {table_name} SELECT * FROM temp_df")
         else:
-            return self.persist_table("temp_df", table_name, pk_column)
+            return self.save_table(table_object, table_name, pk_column)
 
     def execute_sql(self, sql: str, parameters=None) -> duckdb.DuckDBPyConnection:
         """

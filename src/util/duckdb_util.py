@@ -34,6 +34,26 @@ def rows_into_model_list(db_relation: DuckDBPyRelation, model_class: Type[T]) ->
     return [model_class(*r) for r in model_rows]
 
 
+def sync_dict_to_duckdb(data_dict: dict[str, str], table_name: str, duckdb_session: DuckDBSession,
+                        pk_column: str = "id",
+                        overwrite: bool = False):
+    """
+    将实体类列表同步到 DuckDB 表中
+
+    :param pk_column: 主键
+    :param overwrite: 是否覆盖
+    :param data_dict: 实体类对象列表（支持 dataclass 或 pydantic 模型）
+    :param table_name: DuckDB 中目标表名
+    :param duckdb_session: 已有的 DuckDB 会话实例
+    """
+    if not data_dict:
+        return
+    if overwrite:
+        duckdb_session.save_table(data_dict, table_name)
+    else:
+        duckdb_session.upsert_table(data_dict, table_name, pk_column)
+
+
 def sync_list_to_duckdb(items: List[dataclass], table_name: str, duckdb_session: DuckDBSession,
                         pk_column: str = "id",
                         overwrite: bool = True):
@@ -55,25 +75,3 @@ def sync_list_to_duckdb(items: List[dataclass], table_name: str, duckdb_session:
         duckdb_session.save_table(df, table_name)
     else:
         duckdb_session.upsert_table(df, table_name, pk_column)
-
-
-def sync_dict_to_duckdb(data_dict: dict[str, str], table_name: str, duckdb_session: DuckDBSession,
-                        overwrite: bool = True):
-    """
-    将实体类列表同步到 DuckDB 表中
-
-    :param overwrite: 是否覆盖
-    :param data_dict: 实体类对象列表（支持 dataclass 或 pydantic 模型）
-    :param table_name: DuckDB 中目标表名
-    :param duckdb_session: 已有的 DuckDB 会话实例
-    """
-    if not data_dict:
-        return
-    if overwrite:
-        duckdb_session.execute_sql(f"DROP TABLE IF EXISTS {table_name}")
-
-    duckdb_session.execute_sql(f"CREATE TABLE IF NOT EXISTS {table_name} (key VARCHAR PRIMARY KEY, value VARCHAR)")
-
-    for key, value in data_dict.items():
-        duckdb_session.execute_sql(f"INSERT OR REPLACE INTO {table_name} VALUES (?, ?)", [key, value])
-
