@@ -39,7 +39,7 @@ def rows_into_model_list(db_relation: DuckDBPyRelation, model_class: Type[T]) ->
     return [model_class(*r) for r in model_rows]
 
 
-def sync_dict_to_duckdb(data_dict: dict[str, str], table_name: str, duckdb_session: DuckDBSession,
+def sync_dict_to_duckdb(data_dict: dict[int | str, str], table_name: str, duckdb_session: DuckDBSession,
                         pk_column: str = "id",
                         overwrite: bool = False):
     """

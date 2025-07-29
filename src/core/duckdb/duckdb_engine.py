@@ -160,9 +160,15 @@ class DuckDBSession:
         :param table_name: 表名
         :return: DuckDB 连接对象
         """
-        if isinstance(table_object, dict):
+        if table_object and isinstance(table_object, dict):
+            first_key = next(iter(table_object))
+            if isinstance(first_key, int):
+                key_type = "BIGINT"
+            else:
+                key_type = "VARCHAR"
+
             self.__conn.execute(
-                f"CREATE OR REPLACE TABLE {table_name} ({pk_column} VARCHAR PRIMARY KEY, value VARCHAR)")
+                f"CREATE OR REPLACE TABLE {table_name} ({pk_column} {key_type} PRIMARY KEY, value VARCHAR)")
             return self.__conn.executemany(f"INSERT OR REPLACE INTO {table_name} VALUES (?, ?)",
                                            list(table_object.items()))
         else:
@@ -181,7 +187,7 @@ class DuckDBSession:
         if self.table_exists(table_name):
             if not self.get_primary_key_columns(table_name):
                 self.__conn.execute(f"ALTER TABLE {table_name} ADD PRIMARY KEY ({pk_column})")
-            if isinstance(table_object, dict):
+            if table_object and isinstance(table_object, dict):
                 return self.__conn.executemany(f"INSERT OR REPLACE INTO {table_name} VALUES (?, ?)",
                                                list(table_object.items()))
             else:

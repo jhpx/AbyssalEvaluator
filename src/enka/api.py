@@ -2,6 +2,7 @@ class EnkaApi:
     ENKA_API_BASE = "https://enka.network/api"
     ENKA_API_DOCS_BASE = "https://raw.githubusercontent.com/EnkaNetwork/API-docs/master/store"
 
+    FILE_LOC = "loc"
     @classmethod
     def get_player_url(cls, uid: str) -> str:
         """
@@ -35,9 +36,9 @@ class EnkaApi:
         return cls.ENKA_API_DOCS_BASE + "/characters.json"
 
     @classmethod
-    def get_namecard_json(cls):
+    def get_name_card_json(cls):
         """
-        获取namecard本地化json
+        获取name_card本地化json
         :return:
         """
         return cls.ENKA_API_DOCS_BASE + "/namecards.json"

@@ -11,7 +11,7 @@ from src.enka.config.prop_id_map import ID_MAP, SUB_ID_MAP
 class TestIDMap(unittest.TestCase):
     def test_artifact_main_stat_mapping(self):
         # 加载 player.json 文件
-        json_path = Path("json/player.json")
+        json_path = Path("json/uid/player.json")
         with open(json_path, "r", encoding="utf-8") as f:
             data = json.load(f)
 
@@ -51,7 +51,7 @@ class TestIDMap(unittest.TestCase):
 
     def test_artifact_sub_stat_mapping(self):
         # 加载 player.json 文件
-        json_path = Path("json/player.json")
+        json_path = Path("json/uid/player.json")
         with open(json_path, "r", encoding="utf-8") as f:
             data = json.load(f)
 

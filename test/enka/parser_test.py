@@ -133,7 +133,7 @@ class TestEnkaParser(unittest.TestCase):
         self.assertIsInstance(character, Character)
 
     def test_parse_player(self):
-        with open('json/player.json', 'r', encoding='utf-8') as f:
+        with open('json/uid/player.json', 'r', encoding='utf-8') as f:
             data = json.load(f)
         player = EnkaParser.parse_player(data)
         self.assertIsInstance(player, Player)

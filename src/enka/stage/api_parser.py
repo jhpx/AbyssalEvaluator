@@ -31,17 +31,16 @@ class EnkaParser:
         ]
 
         # 构造参数字典
-        weapon_dict = {
-            "id": data.get("itemId", 0),
-            "level": weapon_data.get("level", 1),
-            "promote_level": weapon_data.get("promoteLevel", 0),
-            "refine": refine + 1,
-            "rank": flat_data.get("rankLevel", 0),
-            "icon": flat_data.get("icon", ""),
-            "weapon_stats": weapon_stats
-        }
-
-        return from_dict(data_class=Weapon, data=weapon_dict)
+        return Weapon(
+            id=data.get("itemId", 0),
+            name=asset_map["loc"].get(flat_data.get("nameTextMapHash")),
+            level=weapon_data.get("level", 1),
+            promote_level=weapon_data.get("promoteLevel", 0),
+            refine=refine + 1,
+            rank=flat_data.get("rankLevel", 0),
+            icon=flat_data.get("icon", ""),
+            weapon_stats=weapon_stats
+        )
 
     @staticmethod
     def parse_artifact(data: dict, asset_map: dict) -> Artifact:
@@ -83,7 +82,8 @@ class EnkaParser:
     def parse_equip_item(data: dict, asset_map: dict) -> Artifact | Weapon | None:
         """解析圣遗物装备或武器装备"""
         if data.get("reliquary"):
-            return EnkaParser.parse_artifact(data, asset_map)
+            return None
+            # return EnkaParser.parse_artifact(data, asset_map)
         elif data.get("weapon"):
             return EnkaParser.parse_weapon(data, asset_map)
         else:
@@ -99,16 +99,18 @@ class EnkaParser:
 
         # 基础属性
         avatar_id = data.get("avatarId", 0)
+        character_meta = asset_map["character"].get(avatar_id)
+
+        # 等级
         prop_map = data.get("propMap", {})
         level_data = prop_map.get("4001", {})  # 等级信息键是 "4001"
         level = int(level_data.get("val", 1)) if level_data else 1
 
+        # 天赋等级
+        talent_level_map = {int(k): v for k, v in data.get("skillLevelMap", {}).items()}
+
         # 好感度
         friendship_level = data.get("fetterInfo", {}).get("expLevel", 0)
-
-        # 天赋等级（可选）
-        talent_id_list = data.get("talentIdList", [])
-        talent_level_map = data.get("skillLevelMap", {})
 
         # 装备信息
         equip_list = data.get("equipList", [])
@@ -118,29 +120,29 @@ class EnkaParser:
         artifact_map = {}
 
         for equip in equip_list:
-            parsed_item = EnkaParser.parse_equip_item(equip)
-
+            parsed_item = EnkaParser.parse_equip_item(equip, asset_map)
             if isinstance(parsed_item, Weapon):
                 weapon = parsed_item
             elif isinstance(parsed_item, Artifact):
                 artifact_map[parsed_item.equipment_type] = parsed_item
+                pass
 
         # 构造参数字典
-        character_dict = {
-            "avatarId": avatar_id,
-            "level": level,
-            "rank": data.get("rankLevel", 5),
-            "talent": [],
-            "friendship": friendship_level,
-            "weapon": weapon,
-            "artifact_flower": artifact_map[EquipmentType.FLOWER],
-            "artifact_plume": artifact_map[EquipmentType.PLUME],
-            "artifact_sands": artifact_map[EquipmentType.SANDS],
-            "artifact_goblet": artifact_map[EquipmentType.GOBLET],
-            "artifact_circlet": artifact_map[EquipmentType.CIRCLET],
-        }
-
-        return from_dict(data_class=Character, data=character_dict)
+        return Character(
+            avatarId=avatar_id,
+            name=asset_map["loc"].get(character_meta.name_text_hash),
+            _side_avatar_icon=character_meta.side_avatar_icon,
+            level=level,
+            rank=data.get("rankLevel", 5),
+            talent=talent_level_map,
+            friendship=friendship_level,
+            weapon=weapon,
+            artifact_flower=artifact_map.get(EquipmentType.FLOWER,None),
+            artifact_plume=artifact_map.get(EquipmentType.PLUME,None),
+            artifact_sands=artifact_map.get(EquipmentType.SANDS,None),
+            artifact_goblet=artifact_map.get(EquipmentType.GOBLET,None),
+            artifact_circlet=artifact_map.get(EquipmentType.CIRCLET,None),
+        )
 
     @staticmethod
     def parse_player(data: dict, asset_map: dict) -> Player:
@@ -151,21 +153,30 @@ class EnkaParser:
         characters_data = data.get("avatarInfoList", [])
         characters = []
         for character_data in characters_data:
-            characters.append(EnkaParser.parse_character(character_data))
+            characters.append(EnkaParser.parse_character(character_data, asset_map))
+
+        name_card_id = player_data.get("nameCardId", 0)
+
+        profile_icon_id = player_data.get("profilePicture", {}).get("id", 100000)
 
         # 构造Player对象
-        player_dict = {
-            "uid": int(data.get("uid", 0)),
-            "nickname": player_data.get("nickname", ""),
-            "level": player_data.get("level", 1),
-            "world_level": player_data.get("worldLevel", 0),
-            "finish_achievement_num": player_data.get("finishAchievementNum", 0),
-            "tower_floor_index": player_data.get("towerFloorIndex", 0),
-            "tower_level_index": player_data.get("towerLevelIndex", 0),
-            "tower_star_index": player_data.get("towerStarIndex", 0),
-            "profile_icon_id": player_data.get("profilePicture").get("id", 100000),
-            "full_friendship_num": player_data.get("fetterCount", 0),
-            "characters": characters
-        }
-
-        return from_dict(data_class=Player, data=player_dict)
+        return Player(
+            uid=int(data.get("uid", 0)),
+            nickname=player_data.get("nickname", ""),
+            level=player_data.get("level", 1),
+            world_level=player_data.get("worldLevel", 0),
+            name_card_id=name_card_id,
+            name_card=asset_map["namecard"].get(name_card_id),
+            profile_icon_id=profile_icon_id,
+            profile_icon=asset_map["pfp"].get(profile_icon_id),
+            finish_achievement_num=player_data.get("finishAchievementNum", 0),
+            abyss_floor_index=player_data.get("towerFloorIndex", 0),
+            abyss_level_index=player_data.get("towerLevelIndex", 0),
+            abyss_star_index=player_data.get("towerStarIndex", 0),
+            theater_act_index=player_data.get("theaterActIndex", 0),
+            theater_star_index=player_data.get("theaterStarIndex", 0),
+            stygian_difficulty=player_data.get("stygianIndex", 0),
+            stygian_clear_time=player_data.get("stygianSeconds", 0),
+            max_friendship_character_count=player_data.get("fetterCount", 0),
+            characters=characters
+        )

@@ -17,6 +17,10 @@ class Player:
     level: int
     # 世界等级
     world_level: int
+    # 名片
+    name_card_id: int
+    # 名片路径
+    name_card: str
     # 图标
     profile_icon_id: int
     # 图标路径
