@@ -19,10 +19,16 @@ class Character:
     _side_avatar_icon: str
     # 等级
     level: int
+    # 经验值
+    exp:int
+    # 突破
+    promote_level: int
     # 稀有度
     rank: int
+    # 属性
+    element: str
     # 天赋
-    talent: dict[int,int]
+    talent_levels: dict[int,int]
     # 好感度
     friendship: int
     # 武器

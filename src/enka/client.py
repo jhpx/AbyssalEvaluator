@@ -9,6 +9,7 @@ from src.enka.model.player import Player
 from src.enka.stage.api_parser import EnkaParser
 from src.enka.stage.asset_parser import EnkaAssetParser
 from src.enka.stage.synchronizer import EnkaAssetSynchronizer
+from src.enka.stage.text_displayer import EnkaTextDisplayer
 from src.enka.test_api import TestEnkaApi
 from src.util.duckdb_util import rows_into_model_dict
 from src.util.http_util import fetch_and_parse
@@ -102,21 +103,28 @@ class EnkaClient:
         :return: Player 实例 或 None
         """
         await self.refresh_assets()
-        player = await fetch_and_parse(
+        self._player = await fetch_and_parse(
             client=self._client,
             url=TestEnkaApi.get_player_url(uid),
             parser=lambda data: EnkaParser.parse_player(data, self._asset_map)
         )
-        return player
+        return self._player
 
-    async def get_player(self, uid: str, lang: str = 'zh') -> Optional[Player]:
+    async def refresh_player(self):
         """
         从本地数据库获取玩家信息
 
-        :param uid: 玩家 UID
-        :param lang: 语言（默认为 'zh'）
         :return: Player 实例 或 None
         """
         if not self._player:
             self._player = rows_into_model_dict(self._db.extract_table("player"), Player)
-        return self._player
+        return
+
+    def info_player(self) -> str:
+        """
+        返回一个支持国际化的玩家信息字符串表示
+
+        :return: 本地化的字符串表示
+        """
+        return EnkaTextDisplayer.display_player(self._player,self._asset_map["loc"])
+

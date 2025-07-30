@@ -44,14 +44,3 @@ CHARACTER_RARITY_MAP: dict[str, Literal[4, 5]] = {
     "QUALITY_ORANGE_SP": 5,
     "QUALITY_PURPLE": 4,
 }
-
-# 角色突破与等级对应关系
-ASCENSION_TO_MAX_LEVEL: dict[Literal[0, 1, 2, 3, 4, 5, 6], Literal[20, 40, 50, 60, 70, 80, 90]] = {
-    0: 20,
-    1: 40,
-    2: 50,
-    3: 60,
-    4: 70,
-    5: 80,
-    6: 90,
-}

@@ -45,11 +45,47 @@ class StatType(StrEnum):
 @dataclass
 class Stat:
     """属性类"""
-    # 属性字符串
+    # 属性类型
     stat_type: StatType
     # 属性值
     stat_value: float
 
-    # 属性字符串
-    def __repr__(self):
-        return f"{self.stat_type.name}: {self.stat_value}"
+    # 属性值转字符串
+    @property
+    def stat_value_str(self):
+        if self.stat_type in PERCENT_STAT_TYPES:
+            return f"{self.stat_value}%"
+        else:
+            return str(self.stat_value)
+
+
+# 全部元素伤害加成的属性集合
+DMG_BONUS_STAT_TYPES = {
+    StatType.FIRE_DMG_BONUS,
+    StatType.ELECTRO_DMG_BONUS,
+    StatType.ICE_DMG_BONUS,
+    StatType.WATER_DMG_BONUS,
+    StatType.ROCK_DMG_BONUS,
+    StatType.WIND_DMG_BONUS,
+    StatType.GRASS_DMG_BONUS,
+    StatType.PHYSICAL_DMG_BONUS,
+}
+
+# 全部百分比加成的属性集合
+PERCENT_STAT_TYPES = {
+    StatType.HP_PERCENT,
+    StatType.ATK_PERCENT,
+    StatType.DEF_PERCENT,
+    StatType.CRIT_RATE,
+    StatType.CRIT_DMG,
+    StatType.ELEMENTAL_CHARGE,
+    StatType.FIRE_DMG_BONUS,
+    StatType.ELECTRO_DMG_BONUS,
+    StatType.ICE_DMG_BONUS,
+    StatType.WATER_DMG_BONUS,
+    StatType.ROCK_DMG_BONUS,
+    StatType.WIND_DMG_BONUS,
+    StatType.GRASS_DMG_BONUS,
+    StatType.PHYSICAL_DMG_BONUS,
+    StatType.HEALING_BONUS,
+}

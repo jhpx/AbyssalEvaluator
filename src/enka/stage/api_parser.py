@@ -101,10 +101,14 @@ class EnkaParser:
         avatar_id = data.get("avatarId", 0)
         character_meta = asset_map["character"].get(avatar_id)
 
-        # 等级
+        # 等级、经验值、突破
         prop_map = data.get("propMap", {})
         level_data = prop_map.get("4001", {})  # 等级信息键是 "4001"
         level = int(level_data.get("val", 1)) if level_data else 1
+        exp_data = prop_map.get("1001", {})  # 经验值信息键是 "1001"
+        exp = int(exp_data.get("val", 0)) if exp_data else 0
+        promote_level_data = prop_map.get("1002", {})  # 突破信息键是 "1002"
+        promote_level = int(promote_level_data.get("val", 0)) if promote_level_data else 0
 
         # 天赋等级
         talent_level_map = {int(k): v for k, v in data.get("skillLevelMap", {}).items()}
@@ -133,8 +137,11 @@ class EnkaParser:
             name=asset_map["loc"].get(character_meta.name_text_hash),
             _side_avatar_icon=character_meta.side_avatar_icon,
             level=level,
-            rank=data.get("rankLevel", 5),
-            talent=talent_level_map,
+            exp=exp,
+            promote_level=promote_level,
+            rank=character_meta.rank,
+            element=character_meta.element,
+            talent_levels=talent_level_map,
             friendship=friendship_level,
             weapon=weapon,
             artifact_flower=artifact_map.get(EquipmentType.FLOWER,None),

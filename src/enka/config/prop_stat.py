@@ -52,38 +52,6 @@ SUB_ID_MAP = {
 }
 
 
-# 全部元素伤害加成的属性集合
-DMG_BONUS_STAT_TYPES = {
-    StatType.FIRE_DMG_BONUS,
-    StatType.ELECTRO_DMG_BONUS,
-    StatType.ICE_DMG_BONUS,
-    StatType.WATER_DMG_BONUS,
-    StatType.ROCK_DMG_BONUS,
-    StatType.WIND_DMG_BONUS,
-    StatType.GRASS_DMG_BONUS,
-    StatType.PHYSICAL_DMG_BONUS,
-}
-
-# 全部百分比加成的属性集合
-PERCENT_STAT_TYPES = {
-    StatType.HP_PERCENT,
-    StatType.ATK_PERCENT,
-    StatType.DEF_PERCENT,
-    StatType.CRIT_RATE,
-    StatType.CRIT_DMG,
-    StatType.ELEMENTAL_CHARGE,
-    StatType.FIRE_DMG_BONUS,
-    StatType.ELECTRO_DMG_BONUS,
-    StatType.ICE_DMG_BONUS,
-    StatType.WATER_DMG_BONUS,
-    StatType.ROCK_DMG_BONUS,
-    StatType.WIND_DMG_BONUS,
-    StatType.GRASS_DMG_BONUS,
-    StatType.PHYSICAL_DMG_BONUS,
-    StatType.HEALING_BONUS,
-}
-
-
 class FightPropType(IntEnum):
     """该枚举类表示战斗计算中的各种属性类型."""
 
