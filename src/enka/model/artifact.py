@@ -11,14 +11,18 @@ class Artifact:
     """圣遗物类"""
     # ID
     id: int
-    # 套装ID
-    set_id: int
+    # 名称
+    name: str
     # 等级
     level: int
     # 装备位置
     equipment_type: EquipmentType
     # 稀有度
     rank: int
+    # 套装ID
+    set_id: int
+    # 套装名称
+    set_name: str
     # 图标
     icon: str
     # 主属性ID
@@ -29,10 +33,7 @@ class Artifact:
     main_stat: Stat
     # 副属性
     sub_stats: List[Stat]
-    # 名称
-    name: str = ""
-    # 套装名称
-    set_name: str = ""
+
     # 评分
     score: float = 0
 

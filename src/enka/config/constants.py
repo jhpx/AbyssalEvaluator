@@ -53,5 +53,5 @@ class Element(StrEnum):
     WATER = "💧"
     ELECTRIC = "⚡️"
     ROCK = "🪨"
-    WIND = "💨"
-    GRASS = "🌿"
+    WIND = "🍃"
+    GRASS = "🌱"

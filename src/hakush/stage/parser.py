@@ -1,9 +1,9 @@
 from typing import List, Dict
 
-from src.models.meta.artifact_info import ArtifactInfo
-from src.models.meta.artifact_set_info import ArtifactSetInfo
-from src.models.meta.character_info import CharacterInfo
-from src.models.meta.weapon_info import WeaponInfo
+from src.hakush.model.artifact_info import ArtifactInfo
+from src.hakush.model.artifact_set_info import ArtifactSetInfo
+from src.hakush.model.character_info import CharacterInfo
+from src.hakush.model.weapon_info import WeaponInfo
 
 
 class HakushParser:

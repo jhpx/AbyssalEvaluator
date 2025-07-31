@@ -4,40 +4,40 @@ from enum import IntEnum
 from src.enka.config.constants import EquipmentType
 from src.enka.model.stat import StatType
 
-ID_MAP = {
-    # 生之花
-    14001: (EquipmentType.FLOWER, StatType.HP),
-
-    # 死之羽
-    12001: (EquipmentType.PLUME, StatType.ATK),
-
-    # 理之冠
-    13002: (EquipmentType.CIRCLET, StatType.HP_PERCENT),
-    13004: (EquipmentType.CIRCLET, StatType.ATK_PERCENT),
-    13006: (EquipmentType.CIRCLET, StatType.DEF_PERCENT),
-    13007: (EquipmentType.CIRCLET, StatType.CRIT_RATE),
-    13008: (EquipmentType.CIRCLET, StatType.CRIT_DMG),
-    13009: (EquipmentType.CIRCLET, StatType.HEALING_BONUS),
-
-    # 时之沙
-    10002: (EquipmentType.SANDS, StatType.HP_PERCENT),
-    10004: (EquipmentType.SANDS, StatType.ATK_PERCENT),
-    10006: (EquipmentType.SANDS, StatType.DEF_PERCENT),
-    10007: (EquipmentType.SANDS, StatType.ELEMENTAL_CHARGE),
-
-    # 空之杯
-    15002: (EquipmentType.GOBLET, StatType.HP_PERCENT),
-    15004: (EquipmentType.GOBLET, StatType.ATK_PERCENT),
-    15006: (EquipmentType.GOBLET, StatType.DEF_PERCENT),
-    15008: (EquipmentType.GOBLET, StatType.FIRE_DMG_BONUS),
-    15009: (EquipmentType.GOBLET, StatType.ELECTRO_DMG_BONUS),
-    15010: (EquipmentType.GOBLET, StatType.ICE_DMG_BONUS),
-    15011: (EquipmentType.GOBLET, StatType.WATER_DMG_BONUS),
-    15012: (EquipmentType.GOBLET, StatType.GRASS_DMG_BONUS),
-    15013: (EquipmentType.GOBLET, StatType.ROCK_DMG_BONUS),
-    15014: (EquipmentType.GOBLET, StatType.WIND_DMG_BONUS),
-}
-
+# ID_MAP = {
+#     # 生之花
+#     14001: (EquipmentType.FLOWER, StatType.HP),
+#
+#     # 死之羽
+#     12001: (EquipmentType.PLUME, StatType.ATK),
+#
+#     # 理之冠
+#     13002: (EquipmentType.CIRCLET, StatType.HP_PERCENT),
+#     13004: (EquipmentType.CIRCLET, StatType.ATK_PERCENT),
+#     13006: (EquipmentType.CIRCLET, StatType.DEF_PERCENT),
+#     13007: (EquipmentType.CIRCLET, StatType.CRIT_RATE),
+#     13008: (EquipmentType.CIRCLET, StatType.CRIT_DMG),
+#     13009: (EquipmentType.CIRCLET, StatType.HEALING_BONUS),
+#
+#     # 时之沙
+#     10002: (EquipmentType.SANDS, StatType.HP_PERCENT),
+#     10004: (EquipmentType.SANDS, StatType.ATK_PERCENT),
+#     10006: (EquipmentType.SANDS, StatType.DEF_PERCENT),
+#     10007: (EquipmentType.SANDS, StatType.ELEMENTAL_CHARGE),
+#
+#     # 空之杯
+#     15002: (EquipmentType.GOBLET, StatType.HP_PERCENT),
+#     15004: (EquipmentType.GOBLET, StatType.ATK_PERCENT),
+#     15006: (EquipmentType.GOBLET, StatType.DEF_PERCENT),
+#     15008: (EquipmentType.GOBLET, StatType.FIRE_DMG_BONUS),
+#     15009: (EquipmentType.GOBLET, StatType.ELECTRO_DMG_BONUS),
+#     15010: (EquipmentType.GOBLET, StatType.ICE_DMG_BONUS),
+#     15011: (EquipmentType.GOBLET, StatType.WATER_DMG_BONUS),
+#     15012: (EquipmentType.GOBLET, StatType.GRASS_DMG_BONUS),
+#     15013: (EquipmentType.GOBLET, StatType.ROCK_DMG_BONUS),
+#     15014: (EquipmentType.GOBLET, StatType.WIND_DMG_BONUS),
+# }
+#
 SUB_ID_MAP = {
     50102: StatType.HP,
     50103: StatType.HP_PERCENT,

@@ -1,6 +1,6 @@
 from src.core.duckdb.duckdb_engine import DuckDBSession
 from src.enka.model.character_meta import CharacterMeta
-from src.util.duckdb_util import sync_dict_to_duckdb, sync_list_to_duckdb, rows_into_model_dict
+from src.core.util.duckdb_util import sync_dict_to_duckdb, sync_list_to_duckdb, rows_into_model_dict
 
 
 class EnkaAssetSynchronizer:

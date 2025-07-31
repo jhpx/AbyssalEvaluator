@@ -3,7 +3,7 @@ from typing import Dict, Callable, List, TypeVar
 
 import httpx
 
-from src.util.logger import logger
+from src.core.util.logger import logger
 
 T = TypeVar("T")
 

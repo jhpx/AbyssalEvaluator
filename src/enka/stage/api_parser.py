@@ -1,13 +1,11 @@
 # parser.py
 
-from dacite import from_dict
-
+from src.enka.config.constants import EquipmentType, Element
 from src.enka.model.artifact import Artifact
 from src.enka.model.character import Character
 from src.enka.model.player import Player
 from src.enka.model.stat import Stat, StatType
 from src.enka.model.weapon import Weapon
-from src.enka.config.constants import EquipmentType, Element
 
 
 class EnkaParser:
@@ -56,34 +54,33 @@ class EnkaParser:
         )
 
         # 解析副属性
-        sub_stats_data = flat_data.get("reliquarySubstats", [])
         sub_stats = [
             Stat(StatType(sub.get("appendPropId")), stat_value=sub.get("statValue", 0.0))
-            for sub in sub_stats_data
+            for sub in flat_data.get("reliquarySubstats", [])
         ]
 
         # 构造参数字典
-        artifact_dict = {
-            "id": data.get("itemId", 0),
-            "level": reliquary_data.get("level", 1) - 1,
-            "equipment_type": EquipmentType(flat_data.get("equipType", "")),
-            "rank": flat_data.get("rankLevel", 0),
-            "set_id": flat_data.get("setId", 0),
-            "icon": flat_data.get("icon", ""),
-            "main_stat_id": reliquary_data.get("mainPropId"),
-            "sub_stat_ids": reliquary_data.get("appendPropIdList"),
-            "main_stat": main_stat,
-            "sub_stats": sub_stats
-        }
-
-        return from_dict(data_class=Artifact, data=artifact_dict)
+        return Artifact(
+            id= data.get("itemId", 0),
+            # 默认的loc查不到此名称
+            name="TextHash_"+flat_data.get("nameTextMapHash"),
+            level= reliquary_data.get("level", 1) - 1,
+            equipment_type= EquipmentType(flat_data.get("equipType")),
+            rank= flat_data.get("rankLevel", 0),
+            set_id= flat_data.get("setId", 0),
+            set_name=asset_map["loc"].get(flat_data.get("setNameTextMapHash")),
+            icon=flat_data.get("icon", ""),
+            main_stat_id= reliquary_data.get("mainPropId"),
+            sub_stat_ids= reliquary_data.get("appendPropIdList"),
+            main_stat= main_stat,
+            sub_stats= sub_stats
+        )
 
     @staticmethod
     def parse_equip_item(data: dict, asset_map: dict) -> Artifact | Weapon | None:
         """解析圣遗物装备或武器装备"""
         if data.get("reliquary"):
-            return None
-            # return EnkaParser.parse_artifact(data, asset_map)
+            return EnkaParser.parse_artifact(data, asset_map)
         elif data.get("weapon"):
             return EnkaParser.parse_weapon(data, asset_map)
         else:
@@ -93,12 +90,13 @@ class EnkaParser:
     def parse_character(data: dict, asset_map: dict) -> Character:
         """
         解析角色信息
+        :param asset_map: 国际化字典
         :param data: 包含角色信息的字典
         :return: Character 对象
         """
 
         # 基础属性
-        avatar_id = data.get("avatarId", 0)
+        avatar_id = data.get("avatarId")
         character_meta = asset_map["character"].get(avatar_id)
 
         # 等级、经验值、突破
@@ -144,7 +142,7 @@ class EnkaParser:
             exp=exp,
             promote_level=promote_level,
             rank=character_meta.rank,
-            element=Element[character_meta.element.upper()],
+            element=getattr(Element, character_meta.element.upper()),
             talent_ids=talent_ids,
             skill_names=character_meta.skill_names,
             skill_level_map=skill_level_map,

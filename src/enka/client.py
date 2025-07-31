@@ -3,7 +3,6 @@ from typing import Optional
 import httpx
 
 from src.core.duckdb.duckdb_engine import DuckDBSession
-from src.enka.api import EnkaApi
 from src.enka.config.constants import Language
 from src.enka.model.player import Player
 from src.enka.stage.api_parser import EnkaParser
@@ -11,8 +10,8 @@ from src.enka.stage.asset_parser import EnkaAssetParser
 from src.enka.stage.synchronizer import EnkaAssetSynchronizer
 from src.enka.stage.text_displayer import EnkaTextDisplayer
 from src.enka.test_api import TestEnkaApi
-from src.util.duckdb_util import rows_into_model_dict
-from src.util.http_util import fetch_and_parse
+from src.core.util.duckdb_util import rows_into_model_dict
+from src.core.util.http_util import fetch_and_parse
 
 
 class EnkaClient:
