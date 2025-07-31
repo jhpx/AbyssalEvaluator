@@ -142,7 +142,7 @@ class EnkaTextDisplayer:
 
         # 构建圣遗物信息
         info_parts = [
-            f"  {aft.equipment_type}: {aft.set_name} {'★' * aft.rank} (Lv.{aft.level}) Score: {aft.score}",
+            f"  {aft.equipment_type.mv_value(1)}: {aft.set_name} {'★' * aft.rank} (Lv.{aft.level}) Score: {aft.score}",
         ]
 
         # 添加主属性

@@ -1,6 +1,8 @@
 from enum import StrEnum
 from typing import Literal
 
+from src.core.misc.mvenum import MVEnum
+
 
 class Language(StrEnum):
     """语言代码"""
@@ -22,14 +24,14 @@ class Language(StrEnum):
     TURKISH = "tr"
 
 
-class EquipmentType(StrEnum):
+class EquipmentType(MVEnum):
     """圣遗物类型"""
 
-    FLOWER = "EQUIP_BRACER"
-    PLUME = "EQUIP_NECKLACE"
-    SANDS = "EQUIP_SHOES"
-    GOBLET = "EQUIP_RING"
-    CIRCLET = "EQUIP_DRESS"
+    FLOWER = "EQUIP_BRACER", "🌺"
+    PLUME = "EQUIP_NECKLACE","🪶"
+    SANDS = "EQUIP_SHOES","⏳"
+    GOBLET = "EQUIP_RING","🏆"
+    CIRCLET = "EQUIP_DRESS","👑"
 
 
 class ItemType(StrEnum):

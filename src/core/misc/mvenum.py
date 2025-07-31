@@ -15,6 +15,9 @@ class MVEnum(Enum):
         obj._all_values = values
         return obj
 
+    def mv_value(self, index):
+        return self._all_values[index]
+
     # def __repr__(self):
     #     return '<%s.%s: %s>' % (
     #         self.__class__.__name__,
