@@ -34,7 +34,7 @@ async def fetch_and_parse(
         return parser(raw_data)
     except Exception as e:
         logger.error(f"解析失败: {e}")
-        return None
+        raise e
 
 
 async def fetch_http_json(client: httpx.AsyncClient, url: str) -> Dict:

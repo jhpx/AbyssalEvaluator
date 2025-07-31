@@ -1,7 +1,6 @@
 # weapon.py
 
 from dataclasses import dataclass
-from typing import List
 
 from src.enka.model.stat import Stat
 
@@ -24,6 +23,6 @@ class Weapon:
     # 图标
     icon: str
     # 武器附加属性
-    weapon_stats: List[Stat]
+    weapon_stats: list[Stat]
     # 类型
     type: str = ""

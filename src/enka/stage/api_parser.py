@@ -7,7 +7,7 @@ from src.enka.model.character import Character
 from src.enka.model.player import Player
 from src.enka.model.stat import Stat, StatType
 from src.enka.model.weapon import Weapon
-from src.enka.config.constants import EquipmentType
+from src.enka.config.constants import EquipmentType, Element
 
 
 class EnkaParser:
@@ -102,19 +102,23 @@ class EnkaParser:
         character_meta = asset_map["character"].get(avatar_id)
 
         # 等级、经验值、突破
-        prop_map = data.get("propMap", {})
-        level_data = prop_map.get("4001", {})  # 等级信息键是 "4001"
-        level = int(level_data.get("val", 1)) if level_data else 1
-        exp_data = prop_map.get("1001", {})  # 经验值信息键是 "1001"
-        exp = int(exp_data.get("val", 0)) if exp_data else 0
+        prop_map = data.get("propMap")
+        level_data = prop_map.get("4001")  # 等级信息键是 "4001"
+        level = int(level_data.get("val"))
+        exp_data = prop_map.get("1001")  # 经验值信息键是 "1001"
+        exp = int(exp_data.get("val", exp_data.get("ival")))
         promote_level_data = prop_map.get("1002", {})  # 突破信息键是 "1002"
-        promote_level = int(promote_level_data.get("val", 0)) if promote_level_data else 0
+        promote_level = int(promote_level_data.get("val"))
 
+        # 命座
+        talent_ids = data.get("talentIdList", [])
         # 天赋等级
-        talent_level_map = {int(k): v for k, v in data.get("skillLevelMap", {}).items()}
-
+        skill_level_map = data.get("skillLevelMap")
+        proud_skill_extraL_level_map = data.get("proudSkillExtraLevelMap", {})
+        skill_level_ext = {k: proud_skill_extraL_level_map.get(str(v), 0) for k, v in
+                           character_meta.proud_map.items()}
         # 好感度
-        friendship_level = data.get("fetterInfo", {}).get("expLevel", 0)
+        friendship_level = data.get("fetterInfo").get("expLevel")
 
         # 装备信息
         equip_list = data.get("equipList", [])
@@ -140,15 +144,18 @@ class EnkaParser:
             exp=exp,
             promote_level=promote_level,
             rank=character_meta.rank,
-            element=character_meta.element,
-            talent_levels=talent_level_map,
+            element=Element[character_meta.element.upper()],
+            talent_ids=talent_ids,
+            skill_names=character_meta.skill_names,
+            skill_level_map=skill_level_map,
+            skill_level_ext=skill_level_ext,
             friendship=friendship_level,
             weapon=weapon,
-            artifact_flower=artifact_map.get(EquipmentType.FLOWER,None),
-            artifact_plume=artifact_map.get(EquipmentType.PLUME,None),
-            artifact_sands=artifact_map.get(EquipmentType.SANDS,None),
-            artifact_goblet=artifact_map.get(EquipmentType.GOBLET,None),
-            artifact_circlet=artifact_map.get(EquipmentType.CIRCLET,None),
+            artifact_flower=artifact_map.get(EquipmentType.FLOWER, None),
+            artifact_plume=artifact_map.get(EquipmentType.PLUME, None),
+            artifact_sands=artifact_map.get(EquipmentType.SANDS, None),
+            artifact_goblet=artifact_map.get(EquipmentType.GOBLET, None),
+            artifact_circlet=artifact_map.get(EquipmentType.CIRCLET, None),
         )
 
     @staticmethod

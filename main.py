@@ -20,7 +20,7 @@ async def main() -> None:
         # print(await api.get_asset("character"))
         await api.fetch_player("101242308")
         print(api.info_player())
-
+    #
     return None
 
 # async def run_tasks():

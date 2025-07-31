@@ -12,19 +12,19 @@ class EnkaAssetSynchronizer:
 
     @staticmethod
     def sync_loc(data: dict[str, str], db: DuckDBSession):
-        sync_dict_to_duckdb(data, EnkaAssetSynchronizer.TABLE_LOC, db)
+        sync_dict_to_duckdb(data, EnkaAssetSynchronizer.TABLE_LOC, db, overwrite=True)
 
     @staticmethod
     def sync_name_card(data: dict[int, str], db: DuckDBSession):
-        sync_dict_to_duckdb(data, EnkaAssetSynchronizer.TABLE_NAME_CARD, db)
+        sync_dict_to_duckdb(data, EnkaAssetSynchronizer.TABLE_NAME_CARD, db, overwrite=True)
 
     @staticmethod
     def sync_pfp(data: dict[int, str], db: DuckDBSession):
-        sync_dict_to_duckdb(data, EnkaAssetSynchronizer.TABLE_PFP, db)
+        sync_dict_to_duckdb(data, EnkaAssetSynchronizer.TABLE_PFP, db, overwrite=True)
 
     @staticmethod
     def sync_character_meta(data: list[CharacterMeta], db: DuckDBSession):
-        sync_list_to_duckdb(data, EnkaAssetSynchronizer.TABLE_CHARACTER_META, db)
+        sync_list_to_duckdb(data, EnkaAssetSynchronizer.TABLE_CHARACTER_META, db, overwrite=True)
 
     @staticmethod
     def get_loc(db: DuckDBSession) -> dict[str, str]:

@@ -1,5 +1,6 @@
 from logging import raiseExceptions
 
+from src.enka.model.artifact import Artifact
 from src.enka.model.character import Character
 from src.enka.model.player import Player
 from src.enka.model.weapon import Weapon
@@ -73,31 +74,33 @@ class EnkaTextDisplayer:
         if not character:
             return "Invalid character"
 
-
         # 构建角色基本信息
         info_parts = [
-            f"\n=== {character.name} (Lv.{character.level} Exp.{character.exp}) ===",
-            f"Rarity: {'★' * character.rank}",
-            f"Element: {character.element}",
-            f"Friendship Level: {character.friendship}"
+            f"\n=== {character.name} {'★' * character.rank} (Lv.{character.level} Exp.{character.exp}) {character.element} ♥{character.friendship}===",
+            f"Talents: " + ",".join(f'T{t}' for t in character.talent_ids)
         ]
 
         # 添加天赋信息
-        talents = []
-        for talent_id, talent_level in character.talent_levels.items():
-            talent_name = loc_map.get(talent_id, f"(SKILL {talent_id})")
-            talents.append(f"{talent_name} {talent_level}")
-        if talents:
-            info_parts.append("Talents: " + ", ".join(talents))
+        skills = []
+        for skill_id, skill_name in character.skill_names.items():
+            skill_level_str = str(character.skill_level_map.get(skill_id, 1))
+            skill_level_ext = character.skill_level_ext.get(skill_id, 0)
+            if skill_level_ext > 0:
+                skill_level_str += f"+{skill_level_ext}"
+            skills.append(f"{skill_name}: {skill_level_str}")
+
+        info_parts.append("Skills:\n  " + ", ".join(skills))
 
         # 添加武器信息
-        if character.weapon:
-            info_parts.append(EnkaTextDisplayer.display_weapon(character.weapon, loc_map))
+        info_parts.append(EnkaTextDisplayer.display_weapon(character.weapon, loc_map))
 
-        # # 添加圣遗物信息
-        # if character.artifacts:
-        #     for artifact in character.artifacts:
-        #         info_parts.append(EnkaTextDisplayer.display_artifact(artifact, loc_map))
+        # 添加圣遗物信息
+        info_parts.append("Artifacts:")
+        info_parts.append(EnkaTextDisplayer.display_artifact(character.artifact_flower, loc_map))
+        info_parts.append(EnkaTextDisplayer.display_artifact(character.artifact_plume, loc_map))
+        info_parts.append(EnkaTextDisplayer.display_artifact(character.artifact_sands, loc_map))
+        info_parts.append(EnkaTextDisplayer.display_artifact(character.artifact_goblet, loc_map))
+        info_parts.append(EnkaTextDisplayer.display_artifact(character.artifact_circlet, loc_map))
 
         return "\n".join(info_parts)
 
@@ -128,7 +131,7 @@ class EnkaTextDisplayer:
         return "\n".join(info_parts)
 
     @staticmethod
-    def display_artifact(artifact, loc_map: dict) -> str:
+    def display_artifact(artifact: Artifact, loc_map: dict) -> str:
         """
         显示圣遗物信息
         :param artifact: 圣遗物对象
@@ -136,32 +139,32 @@ class EnkaTextDisplayer:
         :return: 圣遗物信息字符串
         """
         if not artifact:
-            return "No artifact"
+            return "  No artifact"
 
         # 获取圣遗物名称和套装名称
-        artifact_name = loc_map.get(str(artifact.id), artifact.name)
-        set_name = loc_map.get(str(artifact.set_id), artifact.set_name)
+        # artifact_name = loc_map.get(str(artifact.id), artifact.name)
+        # set_name = loc_map.get(str(artifact.set_id), artifact.set_name)
+        #
+        # # 构建圣遗物信息
+        # info_parts = [
+        #     f"\n{artifact_name} (+{artifact.level - 1})",
+        #     f"Set: {set_name}",
+        #     f"Rarity: {'★' * artifact.rank}",
+        #     f"Type: {artifact.type}"
+        # ]
+        #
+        # # 添加主属性
+        # if artifact.main_stat:
+        #     main_stat_name = loc_map.get(artifact.main_stat.prop_id, artifact.main_stat.prop_id)
+        #     info_parts.append(f"Main Stat: {main_stat_name} +{artifact.main_stat.value}")
+        #
+        # # 添加副属性
+        # if artifact.sub_stats:
+        #     sub_stats = []
+        #     for stat in artifact.sub_stats:
+        #         stat_name = loc_map.get(stat.prop_id, stat.prop_id)
+        #         sub_stats.append(f"{stat_name} +{stat.value}")
+        #     if sub_stats:
+        #         info_parts.append("Sub Stats: " + ", ".join(sub_stats))
 
-        # 构建圣遗物信息
-        info_parts = [
-            f"\nArtifact: {artifact_name} (+{artifact.level - 1})",
-            f"Set: {set_name}",
-            f"Rarity: {'★' * artifact.rank}",
-            f"Type: {artifact.type}"
-        ]
-
-        # 添加主属性
-        if artifact.main_stat:
-            main_stat_name = loc_map.get(artifact.main_stat.prop_id, artifact.main_stat.prop_id)
-            info_parts.append(f"Main Stat: {main_stat_name} +{artifact.main_stat.value}")
-
-        # 添加副属性
-        if artifact.sub_stats:
-            sub_stats = []
-            for stat in artifact.sub_stats:
-                stat_name = loc_map.get(stat.prop_id, stat.prop_id)
-                sub_stats.append(f"{stat_name} +{stat.value}")
-            if sub_stats:
-                info_parts.append("Sub Stats: " + ", ".join(sub_stats))
-
-        return "\n".join(info_parts)
+        # return "\n".join(info_parts)

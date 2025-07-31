@@ -1,10 +1,10 @@
 # character.py
 
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import Optional
 
+from src.enka.config.constants import Element
 from src.enka.model.artifact import Artifact
-from src.enka.model.stat import Stat
 from src.enka.model.weapon import Weapon
 
 
@@ -20,15 +20,21 @@ class Character:
     # 等级
     level: int
     # 经验值
-    exp:int
+    exp: int
     # 突破
     promote_level: int
     # 稀有度
     rank: int
     # 属性
-    element: str
-    # 天赋
-    talent_levels: dict[int,int]
+    element: Element
+    # 命座
+    talent_ids: list[int]
+    # 主动天赋名称
+    skill_names: dict[str, str]
+    # 主动天赋等级
+    skill_level_map: dict[str, int]
+    # 主动天赋等级增强
+    skill_level_ext: dict[str, int]
     # 好感度
     friendship: int
     # 武器

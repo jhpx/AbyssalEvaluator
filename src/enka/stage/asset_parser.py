@@ -25,11 +25,13 @@ class EnkaAssetParser:
 
         return [CharacterMeta(
             id=int(cid.replace("-", "")),
-            name_text_hash=str(cdata.get("NameTextMapHash", "")),
-            element=cdata.get("Element", ""),
-            side_avatar_icon=cdata.get("SideIconName", ""),
-            rank=CHARACTER_RARITY_MAP.get(cdata.get("QualityType", ""), 0),
-            weapon_type=cdata.get("WeaponType", ""),
-            costume=str(cdata.get("Costumes", {})),
-            skill_order=cdata.get("SkillOrder", []),
+            name_text_hash=str(cdata.get("NameTextMapHash")),
+            element=cdata.get("Element"),
+            side_avatar_icon=cdata.get("SideIconName"),
+            rank=CHARACTER_RARITY_MAP.get(cdata.get("QualityType"), 0),
+            weapon_type=cdata.get("WeaponType"),
+            costume=str(cdata.get("Costumes")),
+            skill_order=cdata.get("SkillOrder"),
+            skill_names=cdata.get("Skills"),
+            proud_map=cdata.get("ProudMap")
         ) for cid, cdata in data.items()]

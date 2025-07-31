@@ -20,6 +20,9 @@ class CharacterMeta:
     weapon_type: str
     # 角色衣装
     costume: str
-    # 技能顺序
-    skill_order: List[int]
-
+    # 天赋顺序
+    skill_order: list[int]
+    # 天赋名称
+    skill_names: dict[str, str]
+    # 固定天赋
+    proud_map: dict[str, int]
