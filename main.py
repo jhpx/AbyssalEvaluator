@@ -22,7 +22,9 @@ async def main() -> None:
         # print(await api.get_asset("pfp"))
         # print(await api.get_asset("character"))
         player = await api.fetch_player("101242308")
-        WeightBasedEvaluator().evaluate_player(player)
+        wbe = WeightBasedEvaluator()
+        await wbe.fetch_character_weights()
+        wbe.evaluate_player(player)
         print(api.info_player())
     #
     return None

@@ -11,10 +11,15 @@ T = TypeVar("T")
 async def fetch_and_parse(
         client: httpx.AsyncClient,
         url: str,
-        parser: Callable[[dict], T | List[T]]):
+        parser: Callable[[dict], T | List[T]],
+        *,
+        headers: Dict = None,
+        params: Dict = None, ):
     """
     获取并解析数据
 
+    :param params: URL参数
+    :param headers: URL头
     :param client: httpx.AsyncClient 实例
     :param url: 请求的URL或本地文件路径
     :param parser: 解析函数
@@ -22,7 +27,7 @@ async def fetch_and_parse(
     """
     # 根据URL协议类型决定使用哪种方式获取数据
     if url.startswith("http"):
-        raw_data = await fetch_http_json(client, url)
+        raw_data = await fetch_http_json(client, url, headers, params)
     else:
         raw_data = await fetch_local_json(url)
 
@@ -37,10 +42,10 @@ async def fetch_and_parse(
         raise e
 
 
-async def fetch_http_json(client: httpx.AsyncClient, url: str) -> Dict:
+async def fetch_http_json(client: httpx.AsyncClient, url: str, headers=None, params=None) -> Dict:
     logger.info(f"使用远端网络地址: {url}")
     try:
-        response = await client.get(url, timeout=100)
+        response = await client.get(url, headers=headers, params=params, timeout=100)
         response.raise_for_status()
         logger.info(f"请求成功: {url}")
         return response.json()
@@ -58,3 +63,4 @@ async def fetch_local_json(file_path: str) -> Dict:
         raise FileNotFoundError(f"JSON 文件未找到: {file_path}")
     except json.JSONDecodeError:
         raise ValueError(f"无法解析 JSON 文件: {file_path}")
+

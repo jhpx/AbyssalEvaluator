@@ -2,11 +2,16 @@
 
 from types import MappingProxyType
 
+import httpx
+
+from src.core.util.http_util import fetch_and_parse
 from src.enka.model.artifact import Artifact
 from src.enka.model.character import Character
 from src.enka.model.player import Player
 from src.enka.model.stat import StatType
+from src.evaluator.config.constants import APP_ID, APP_KEY, CLASS_CHARACTER_STAT_WEIGHT, LEANCLOUD_BASE_URL
 from src.evaluator.model.eval_model import CharacterEval, ArtifactEval
+from src.evaluator.stage.leancloud_parser import LeanCloudParser
 
 # 定义每个圣遗物词条的系数（小助手公式）
 XZS_ARTIFACT_STAT_FACTORS = MappingProxyType({
@@ -54,8 +59,25 @@ class WeightBasedEvaluator:
     def __init__(self):
         self.character_weights_map = {}
 
-    def fetch_character_weights(self):
-        self.character_weights_map = {}
+    async def fetch_character_weights(self):
+        if self.character_weights_map:
+            return None
+
+        headers = {
+            "X-LC-Id": APP_ID,
+            "X-LC-Key": APP_KEY,
+            "Content-Type": "application/json"
+        }
+
+        url = f"{LEANCLOUD_BASE_URL}/1.1/classes/{CLASS_CHARACTER_STAT_WEIGHT}"
+
+        self.character_weights_map = await fetch_and_parse(
+            client=httpx.AsyncClient(proxy="http://127.0.0.1:4081"),
+            url=url,
+            parser=LeanCloudParser.parse_character_weight,
+            headers=headers
+        )
+        return None
 
     def evaluate_artifact(self, artifact: Artifact, character_id: int,
                           factor_dict: dict = XZS_ARTIFACT_STAT_FACTORS,
@@ -74,10 +96,13 @@ class WeightBasedEvaluator:
         # 副词条评分
         for sub_stat in artifact.sub_stats:
             if sub_stat.stat_type in factor_dict.keys():
-                result.score += sub_stat.stat_value * factor_dict[sub_stat.stat_type] * weights.get(sub_stat.stat_type,
-                                                                                                    0)
-        if algorithm == "xzs" and artifact.main_stat.stat_type in [StatType.CRIT_DMG, StatType.CRIT_RATE]:
-            result.score += 20
+                result.score += round(sub_stat.stat_value * factor_dict[sub_stat.stat_type]
+                                 * weights.get(sub_stat.stat_type, 0) / 100,0)
+        if algorithm == "xzs":
+            result.score = round(result.score, 0)
+            if artifact.main_stat.stat_type in [StatType.CRIT_DMG, StatType.CRIT_RATE]:
+                result.score += 20
+
         return result
 
     def evaluate_character(self, character: Character, factor_dict: dict = XZS_ARTIFACT_STAT_FACTORS,
