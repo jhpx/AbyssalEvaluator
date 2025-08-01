@@ -1,4 +1,5 @@
 from src.enka.model import player
+from src.enka.model.character import Character
 from src.enka.model.player import Player
 from src.enka.model.stat import StatType
 
@@ -16,7 +17,7 @@ def print_player(player: Player):
 
 
 def print_character(character):
-    print(f"{character.name}(ID: {character.avatarId}|{character.icon})")
+    print(f"{character.name}(ID: {character.id}|{character.icon})")
     print(f"   等级: {character.level}")
     print(f"   好感度: {character.friendship}")
     wp = character.weapon

@@ -3,6 +3,9 @@ import pickle
 import anyio
 
 from src.enka.client import EnkaClient
+from src.evaluator.wbe import WeightBasedEvaluator
+
+
 # from src.evaluator.artifact_evaluator import WeightBasedArtifactEvaluator as WAE
 # from src.enka.model.character import Character
 # from src.enka.model.stat import StatType
@@ -18,7 +21,8 @@ async def main() -> None:
         # print(await api.get_asset("namecard"))
         # print(await api.get_asset("pfp"))
         # print(await api.get_asset("character"))
-        await api.fetch_player("101242308")
+        player = await api.fetch_player("101242308")
+        WeightBasedEvaluator().evaluate_player(player)
         print(api.info_player())
     #
     return None

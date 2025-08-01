@@ -1,7 +1,8 @@
-# prop_id_map.py
-from enum import IntEnum
+# prop_stat.py
 
-from src.enka.config.constants import EquipmentType
+from enum import IntEnum
+from types import MappingProxyType
+
 from src.enka.model.stat import StatType
 
 # ID_MAP = {
@@ -38,7 +39,7 @@ from src.enka.model.stat import StatType
 #     15014: (EquipmentType.GOBLET, StatType.WIND_DMG_BONUS),
 # }
 #
-SUB_ID_MAP = {
+SUB_STAT_ID_MAP = MappingProxyType({
     50102: StatType.HP,
     50103: StatType.HP_PERCENT,
     50105: StatType.ATK,
@@ -49,7 +50,7 @@ SUB_ID_MAP = {
     50122: StatType.CRIT_DMG,
     50123: StatType.ELEMENTAL_CHARGE,
     50124: StatType.ELEMENTAL_MASTERY,
-}
+})
 
 
 class FightPropType(IntEnum):

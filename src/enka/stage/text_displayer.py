@@ -1,6 +1,6 @@
 from logging import raiseExceptions
 
-from src.enka.config.prop_stat import SUB_ID_MAP
+from src.enka.config.prop_stat import SUB_STAT_ID_MAP
 from src.enka.model.artifact import Artifact
 from src.enka.model.character import Character
 from src.enka.model.player import Player
@@ -97,10 +97,12 @@ class EnkaTextDisplayer:
 
         # 添加圣遗物信息
         info_parts.append("Artifacts:")
-        for aft in [character.artifact_flower, character.artifact_plume, character.artifact_sands,
-                    character.artifact_goblet, character.artifact_circlet]:
+        for aft in character.artifacts:
             info_parts.append(EnkaTextDisplayer.display_artifact(aft, loc_map))
 
+        # 添加总评分
+        info_parts.append(
+            f"Total Score:" + f" {character.total_score:.1f}" if hasattr(character, 'total_score') else "", )
         return "\n".join(info_parts)
 
     @staticmethod
@@ -133,7 +135,7 @@ class EnkaTextDisplayer:
     def display_artifact(aft: Artifact, loc_map: dict) -> str:
         """
         显示圣遗物信息
-        :param artifact: 圣遗物对象
+        :param aft: 圣遗物对象
         :param loc_map: 国际化字典
         :return: 圣遗物信息字符串
         """
@@ -142,15 +144,19 @@ class EnkaTextDisplayer:
 
         # 构建圣遗物信息
         info_parts = [
-            f"  {aft.equipment_type.mv_value(1)}: {aft.set_name} {'★' * aft.rank} (Lv.{aft.level}) Score: {aft.score}",
+
+            f"  {aft.equipment_type.mv_value(1)}: {aft.set_name} {'★' * aft.rank} (Lv.{aft.level})"
+            + f" | Score: {aft.score:.1f}" if hasattr(aft, 'score') else "",
         ]
 
         # 添加主属性
         main_stat_name = loc_map.get(aft.main_stat.stat_type.value)
 
         # 添加副属性
-        sub_stat_appends = [SUB_ID_MAP.get(sid//10) for sid in aft.sub_stat_ids]
-        sub_stats = [f"{loc_map.get(stat.stat_type.value)} {stat.stat_value_str} (+{sub_stat_appends.count(stat.stat_type)-1})" for stat in aft.sub_stats]
+        sub_stat_appends = [SUB_STAT_ID_MAP.get(sid // 10) for sid in aft.sub_stat_ids]
+        sub_stats = [
+            f"{loc_map.get(stat.stat_type.value)} {stat.stat_value_str} (+{sub_stat_appends.count(stat.stat_type) - 1})"
+            for stat in aft.sub_stats]
 
         info_parts.append(f"  Stats: {main_stat_name} {aft.main_stat.stat_value_str}, " + ", ".join(sub_stats))
 

@@ -34,9 +34,6 @@ class Artifact:
     # 副属性
     sub_stats: List[Stat]
 
-    # 评分
-    score: float = 0
-
     def quality(self) -> int:
         """获取圣遗物品质"""
         return len(self.sub_stat_ids) - self.level // 4
@@ -50,4 +47,3 @@ class Artifact:
         for sub_stat in self.sub_stats:
             result[sub_stat.stat_type.name] = sub_stat.stat_value
         return result
-

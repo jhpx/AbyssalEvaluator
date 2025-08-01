@@ -61,19 +61,19 @@ class EnkaParser:
 
         # 构造参数字典
         return Artifact(
-            id= data.get("itemId", 0),
+            id=data.get("itemId", 0),
             # 默认的loc查不到此名称
-            name="TextHash_"+flat_data.get("nameTextMapHash"),
-            level= reliquary_data.get("level", 1) - 1,
-            equipment_type= EquipmentType(flat_data.get("equipType")),
-            rank= flat_data.get("rankLevel", 0),
-            set_id= flat_data.get("setId", 0),
+            name="TextHash_" + flat_data.get("nameTextMapHash"),
+            level=reliquary_data.get("level", 1) - 1,
+            equipment_type=EquipmentType(flat_data.get("equipType")),
+            rank=flat_data.get("rankLevel", 0),
+            set_id=flat_data.get("setId", 0),
             set_name=asset_map["loc"].get(flat_data.get("setNameTextMapHash")),
             icon=flat_data.get("icon", ""),
-            main_stat_id= reliquary_data.get("mainPropId"),
-            sub_stat_ids= reliquary_data.get("appendPropIdList"),
-            main_stat= main_stat,
-            sub_stats= sub_stats
+            main_stat_id=reliquary_data.get("mainPropId"),
+            sub_stat_ids=reliquary_data.get("appendPropIdList"),
+            main_stat=main_stat,
+            sub_stats=sub_stats
         )
 
     @staticmethod
@@ -123,19 +123,20 @@ class EnkaParser:
 
         # 解析武器与圣遗物
         weapon = None
-        artifact_map = {}
+        artifact_list: list[Artifact | None] = [None] * 5
 
         for equip in equip_list:
             parsed_item = EnkaParser.parse_equip_item(equip, asset_map)
             if isinstance(parsed_item, Weapon):
                 weapon = parsed_item
             elif isinstance(parsed_item, Artifact):
-                artifact_map[parsed_item.equipment_type] = parsed_item
+                index = list(EquipmentType).index(parsed_item.equipment_type)
+                artifact_list[index] = parsed_item
                 pass
 
         # 构造参数字典
         return Character(
-            avatarId=avatar_id,
+            id=avatar_id,
             name=asset_map["loc"].get(character_meta.name_text_hash),
             _side_avatar_icon=character_meta.side_avatar_icon,
             level=level,
@@ -149,11 +150,7 @@ class EnkaParser:
             skill_level_ext=skill_level_ext,
             friendship=friendship_level,
             weapon=weapon,
-            artifact_flower=artifact_map.get(EquipmentType.FLOWER, None),
-            artifact_plume=artifact_map.get(EquipmentType.PLUME, None),
-            artifact_sands=artifact_map.get(EquipmentType.SANDS, None),
-            artifact_goblet=artifact_map.get(EquipmentType.GOBLET, None),
-            artifact_circlet=artifact_map.get(EquipmentType.CIRCLET, None),
+            artifacts=artifact_list,
         )
 
     @staticmethod

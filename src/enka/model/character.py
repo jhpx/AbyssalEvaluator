@@ -12,7 +12,7 @@ from src.enka.model.weapon import Weapon
 class Character:
     """角色类"""
     # id
-    avatarId: int
+    id: int
     # 名称
     name: str
     # 图标
@@ -40,11 +40,7 @@ class Character:
     # 武器
     weapon: Weapon
     # 圣遗物
-    artifact_flower: Optional[Artifact]
-    artifact_plume: Optional[Artifact]
-    artifact_sands: Optional[Artifact]
-    artifact_goblet: Optional[Artifact]
-    artifact_circlet: Optional[Artifact]
+    artifacts: list[Artifact]
 
     def side_avatar_icon(self) -> str:
         """获取侧脸图标"""
