@@ -24,3 +24,10 @@ class MVEnum(Enum):
     #         self._name_,
     #         ', '.join([repr(v) for v in self._all_values]),
     #     )
+
+class FromNameMixin:
+    """提供名称查找功能的 mixin"""
+    @classmethod
+    def from_name(cls, name: str):
+        # 实现名称查找逻辑
+        return getattr(cls,name.upper())

@@ -117,19 +117,17 @@ class EnkaTextDisplayer:
             return "No weapon"
 
         # 构建武器信息
-        info_parts = [
-            f"Weapon: {weapon.name} {'★' * weapon.rank} (Lv.{weapon.level}) R{weapon.refine}",
-        ]
-
+        info_title = f"Weapon: {weapon.name} {'★' * weapon.rank} (Lv.{weapon.level}) R{weapon.refine}"
+        info_stat = "  Stats: "
         # 添加武器属性
         if weapon.weapon_stats:
             stats = []
             for stat in weapon.weapon_stats:
                 stats.append(f"{loc_map.get(stat.stat_type, stat.stat_type.name)}: {stat.stat_value_str}")
             if stats:
-                info_parts.append("  Stats: " + ", ".join(stats))
+                info_stat += ", ".join(stats)
 
-        return "\n".join(info_parts)
+        return info_title + "\n" + info_stat
 
     @staticmethod
     def display_artifact(aft: Artifact, loc_map: dict) -> str:
@@ -143,21 +141,22 @@ class EnkaTextDisplayer:
             return "  No artifact"
 
         # 构建圣遗物信息
-        info_parts = [
-
-            f"  {aft.equipment_type.mv_value(1)}: {aft.set_name} {'★' * aft.rank} (Lv.{aft.level})"
-            + f" | Score: {aft.score:.1f}" if hasattr(aft, 'score') else "",
-        ]
-
+        info_title = f"  {aft.equipment_type.mv_value(1)}: {aft.set_name} {'★' * aft.rank} (Lv.{aft.level})"
+        info_title += f" | Score: {aft.score:.1f}" if hasattr(aft, 'score') else ""
+        info_stat = f"  Stats: "
         # 添加主属性
         main_stat_name = loc_map.get(aft.main_stat.stat_type.value)
 
         # 添加副属性
         sub_stat_appends = [SUB_STAT_ID_MAP.get(sid // 10) for sid in aft.sub_stat_ids]
-        sub_stats = [
+        sub_stats_desc = [
             f"{loc_map.get(stat.stat_type.value)} {stat.stat_value_str} (+{sub_stat_appends.count(stat.stat_type) - 1})"
             for stat in aft.sub_stats]
 
-        info_parts.append(f"  Stats: {main_stat_name} {aft.main_stat.stat_value_str}, " + ", ".join(sub_stats))
+        info_stat += f"{main_stat_name} {aft.main_stat.stat_value_str}, " + ", ".join(sub_stats_desc)
+        if hasattr(aft, 'stat_benefits'):
+            sub_stat_benefits = [f"{loc_map.get(stat.stat_type.value)} {aft.stat_benefits[stat.stat_type.value]:.1f}"
+                                 for stat in aft.sub_stats]
+            info_stat += f"\n  StatBenefit: " + ", ".join(sub_stat_benefits)
 
-        return "\n".join(info_parts)
+        return info_title + "\n" + info_stat

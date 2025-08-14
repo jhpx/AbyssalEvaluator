@@ -1,10 +1,12 @@
 # stat.py
 
 from dataclasses import dataclass
-from enum import StrEnum, IntEnum
+from enum import StrEnum
+
+from src.core.misc.mvenum import FromNameMixin
 
 
-class StatType(StrEnum):
+class StatType(FromNameMixin, StrEnum):
     """
     该枚举类表示装备加成中的各种属性类型。
     """
@@ -88,4 +90,11 @@ PERCENT_STAT_TYPES = {
     StatType.GRASS_DMG_BONUS,
     StatType.PHYSICAL_DMG_BONUS,
     StatType.HEALING_BONUS,
+}
+
+# 全部固定值的属性集合
+FIX_STAT_TYPES = {
+    StatType.HP,
+    StatType.ATK,
+    StatType.DEF,
 }

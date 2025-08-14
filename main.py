@@ -1,9 +1,7 @@
-import pickle
-
 import anyio
 
 from src.enka.client import EnkaClient
-from src.evaluator.wbe import WeightBasedEvaluator
+from src.evaluator.algorithm.sbe import StatBasedEvaluator
 
 
 # from src.evaluator.artifact_evaluator import WeightBasedArtifactEvaluator as WAE
@@ -22,9 +20,10 @@ async def main() -> None:
         # print(await api.get_asset("pfp"))
         # print(await api.get_asset("character"))
         player = await api.fetch_player("101242308")
-        wbe = WeightBasedEvaluator()
-        await wbe.fetch_character_weights()
-        wbe.evaluate_player(player)
+        # ev = WeightBasedEvaluator()
+        ev = StatBasedEvaluator()
+        await ev.fetch_character_weights()
+        ev.evaluate_player(player)
         print(api.info_player())
     #
     return None

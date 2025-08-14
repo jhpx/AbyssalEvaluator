@@ -1,10 +1,10 @@
 from enum import StrEnum
 from typing import Literal
 
-from src.core.misc.mvenum import MVEnum
+from src.core.misc.mvenum import MVEnum, FromNameMixin
 
 
-class Language(StrEnum):
+class Language(FromNameMixin, StrEnum):
     """语言代码"""
 
     ENGLISH = "en"
@@ -28,10 +28,10 @@ class EquipmentType(MVEnum):
     """圣遗物类型"""
 
     FLOWER = "EQUIP_BRACER", "🌺"
-    PLUME = "EQUIP_NECKLACE","🪶"
-    SANDS = "EQUIP_SHOES","⏳"
-    GOBLET = "EQUIP_RING","🏆"
-    CIRCLET = "EQUIP_DRESS","👑"
+    PLUME = "EQUIP_NECKLACE", "🪶"
+    SANDS = "EQUIP_SHOES", "⏳"
+    GOBLET = "EQUIP_RING", "🏆"
+    CIRCLET = "EQUIP_DRESS", "👑"
 
 
 class ItemType(StrEnum):
@@ -40,6 +40,7 @@ class ItemType(StrEnum):
     WEAPON = "ITEM_WEAPON"
     ARTIFACT = "ITEM_RELIQUARY"
 
+
 # 角色稀有度
 CHARACTER_RARITY_MAP: dict[str, Literal[4, 5]] = {
     "QUALITY_ORANGE": 5,
@@ -47,7 +48,8 @@ CHARACTER_RARITY_MAP: dict[str, Literal[4, 5]] = {
     "QUALITY_PURPLE": 4,
 }
 
-class Element(StrEnum):
+
+class Element(FromNameMixin, StrEnum):
     """元素类型"""
 
     ICE = "🧊"

@@ -8,6 +8,7 @@ class ArtifactEval(Artifact):
         super().__init__(**artifact.__dict__)
         # 添加新的字段
         self.score = score
+        self.stat_benefits = dict()
 
 
 class CharacterEval(Character):
@@ -16,3 +17,4 @@ class CharacterEval(Character):
         super().__init__(**character.__dict__)
         # 添加新的字段
         self.total_score = total_score
+        self.total_stat_benefit = 0.0

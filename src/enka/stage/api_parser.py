@@ -1,6 +1,7 @@
 # parser.py
 
 from src.enka.config.constants import EquipmentType, Element
+from src.enka.config.prop_stat import FightPropType
 from src.enka.model.artifact import Artifact
 from src.enka.model.character import Character
 from src.enka.model.player import Player
@@ -108,6 +109,12 @@ class EnkaParser:
         promote_level_data = prop_map.get("1002", {})  # 突破信息键是 "1002"
         promote_level = int(promote_level_data.get("val"))
 
+        # 解析战斗面板
+        fight_prop_map = {
+            FightPropType(int(k)): v
+            for k, v in data.get("fightPropMap", {}).items()
+        }
+
         # 命座
         talent_ids = data.get("talentIdList", [])
         # 天赋等级
@@ -130,6 +137,7 @@ class EnkaParser:
             if isinstance(parsed_item, Weapon):
                 weapon = parsed_item
             elif isinstance(parsed_item, Artifact):
+                # 按EquipmentType定义顺序构造圣遗物列表：花、羽、沙、杯、冠
                 index = list(EquipmentType).index(parsed_item.equipment_type)
                 artifact_list[index] = parsed_item
                 pass
@@ -143,7 +151,7 @@ class EnkaParser:
             exp=exp,
             promote_level=promote_level,
             rank=character_meta.rank,
-            element=getattr(Element, character_meta.element.upper()),
+            element=Element.from_name(character_meta.element),
             talent_ids=talent_ids,
             skill_names=character_meta.skill_names,
             skill_level_map=skill_level_map,
@@ -151,6 +159,7 @@ class EnkaParser:
             friendship=friendship_level,
             weapon=weapon,
             artifacts=artifact_list,
+            fight_prop=fight_prop_map
         )
 
     @staticmethod

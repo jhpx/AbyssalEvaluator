@@ -3,6 +3,7 @@
 from enum import IntEnum
 from types import MappingProxyType
 
+from src.core.misc.mvenum import FromNameMixin
 from src.enka.model.stat import StatType
 
 # ID_MAP = {
@@ -53,7 +54,7 @@ SUB_STAT_ID_MAP = MappingProxyType({
 })
 
 
-class FightPropType(IntEnum):
+class FightPropType(FromNameMixin, IntEnum):
     """该枚举类表示战斗计算中的各种属性类型."""
 
     FIGHT_PROP_NONE = 0
@@ -174,4 +175,3 @@ class FightPropType(IntEnum):
     FIGHT_PROP_ELEM_REACT_OVERGROW_FIRE_CRITICAL_HURT = 3042
     FIGHT_PROP_ELEM_REACT_OVERGROW_ELECTRIC_CRITICAL = 3043
     FIGHT_PROP_ELEM_REACT_OVERGROW_ELECTRIC_CRITICAL_HURT = 3044
-

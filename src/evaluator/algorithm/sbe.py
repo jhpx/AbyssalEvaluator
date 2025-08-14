@@ -1,0 +1,83 @@
+# sbe.py
+
+from types import MappingProxyType
+
+from src.enka.config.prop_stat import FightPropType
+from src.enka.model.artifact import Artifact
+from src.enka.model.character import Character
+from src.enka.model.player import Player
+from src.enka.model.stat import StatType, FIX_STAT_TYPES
+from src.evaluator.algorithm.base import BaseEvaluator
+from src.evaluator.model.eval_model import CharacterEval, ArtifactEval
+
+# 定义每个圣遗物词条的标准收益（默认）
+ARTIFACT_STAT_BENEFIT = MappingProxyType({
+    StatType.CRIT_RATE: 3.3,  # 暴击率
+    StatType.CRIT_DMG: 6.6,  # 暴击伤害
+    StatType.ATK_PERCENT: 4.975,  # 攻击百分比
+    StatType.HP_PERCENT: 4.975,  # 生命百分比
+    StatType.DEF_PERCENT: 6.2,  # 防御百分比
+    StatType.ELEMENTAL_MASTERY: 19.75,  # 元素精通
+    StatType.ELEMENTAL_CHARGE: 5.5,  # 充能效率
+})
+
+
+class StatBasedEvaluator(BaseEvaluator):
+    """词条统计法实现圣遗物评分：如YSIN
+
+    YSIN的词条评分算法是：圣遗物得分 = 目前圣遗物词条数 / 默认圣遗物词条数 * 100
+    词条标准收益
+    """
+
+    def evaluate_artifact(self, artifact: Artifact, character: Character,
+                          benefit_dict: dict = ARTIFACT_STAT_BENEFIT,
+                          algorithm: str = "ysin") -> ArtifactEval:
+        """
+        根据预设的权重计算圣遗物的总评分。
+
+        参数:
+            artifact (Artifact): 一个包含圣遗物信息的对象。
+        返回:
+            float: 圣遗物的总评分。
+        """
+        result = ArtifactEval(artifact)
+        weights = self.character_weights_map.get(character.id, self.DEFAULT_CHARACTER_WEIGHTS)
+
+        # 副词条收益统计
+        for sub_stat in artifact.sub_stats:
+            clac_type = sub_stat.stat_type
+            # 固定词条折算成百分比词条
+            if clac_type in FIX_STAT_TYPES:
+                prop_type = FightPropType.from_name(clac_type.value.replace("PROP_", "PROP_BASE_"))
+                base_prop = character.fight_prop.get(prop_type)
+                # 利用名称构造枚举
+                clac_type = StatType.from_name(clac_type.name + "_PERCENT")
+            else:
+                base_prop = 100.0
+            # 计算词条收益
+            if clac_type in benefit_dict.keys():
+                weight = 100 if weights.get(clac_type, 0) > 0 else 0
+                benefit = sub_stat.stat_value * weight / base_prop / benefit_dict[clac_type]
+            else:
+                benefit = 0.0
+
+            result.stat_benefits[sub_stat.stat_type] = round(benefit, 1)
+
+        # 计算总分
+        result.score = round(result.score, 0)
+
+        return result
+
+    def evaluate_character(self, character: Character, benefit_dict: dict = ARTIFACT_STAT_BENEFIT,
+                           algorithm: str = "ysin") -> CharacterEval:
+        result = CharacterEval(character)
+        artifact_evals = [self.evaluate_artifact(aft, character, benefit_dict, algorithm)
+                          for aft in character.artifacts]
+        result.total_score = sum(aft.score for aft in artifact_evals)
+        result.artifacts = artifact_evals
+        return result
+
+    def evaluate_player(self, player: Player, benefit_dict: dict = ARTIFACT_STAT_BENEFIT,
+                        algorithm: str = "ysin"):
+        """计算玩家角色携带的所有圣遗物"""
+        player.characters = [self.evaluate_character(c, benefit_dict, algorithm) for c in player.characters]

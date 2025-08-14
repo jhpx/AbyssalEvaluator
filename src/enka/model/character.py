@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from src.enka.config.constants import Element
+from src.enka.config.prop_stat import FightPropType
 from src.enka.model.artifact import Artifact
 from src.enka.model.weapon import Weapon
 
@@ -41,6 +42,8 @@ class Character:
     weapon: Weapon
     # 圣遗物
     artifacts: list[Artifact]
+    # 面板
+    fight_prop: dict[FightPropType, float]
 
     def side_avatar_icon(self) -> str:
         """获取侧脸图标"""
