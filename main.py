@@ -22,10 +22,10 @@ async def main() -> None:
         player = await api.fetch_player("101242308")
         # ev = WeightBasedEvaluator()
         ev = StatBasedEvaluator()
-        await ev.fetch_character_weights()
+        # await ev.fetch_character_weights()
         ev.evaluate_player(player)
-        print(api.info_player())
-    #
+        # print(api.info_player())
+        print(api.info_character("神里绫华"))
     return None
 
 # async def run_tasks():

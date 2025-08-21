@@ -127,3 +127,13 @@ class EnkaClient:
         """
         return EnkaTextDisplayer.display_player(self._player,self._asset_map["loc"])
 
+    def info_character(self, character_name: str) -> str:
+        """
+        返回一个支持国际化的角色信息字符串表示
+
+        :param character_name: 角色名称
+        :return: 本地化的字符串表示
+        """
+        character = next((char for char in self._player.characters if char.name == character_name), None)
+        return EnkaTextDisplayer.display_character(character,self._asset_map["loc"])
+

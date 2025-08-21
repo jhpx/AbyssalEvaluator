@@ -9,6 +9,7 @@ from src.enka.model.player import Player
 from src.enka.model.stat import StatType, FIX_STAT_TYPES
 from src.evaluator.algorithm.base import BaseEvaluator
 from src.evaluator.model.eval_model import CharacterEval, ArtifactEval
+from src.evaluator.model.genre import GENRE_DEFAULT
 
 # 定义每个圣遗物词条的标准收益（默认）
 ARTIFACT_STAT_BENEFIT = MappingProxyType({
@@ -41,7 +42,7 @@ class StatBasedEvaluator(BaseEvaluator):
             float: 圣遗物的总评分。
         """
         result = ArtifactEval(artifact)
-        weights = self.character_weights_map.get(character.id, self.DEFAULT_CHARACTER_WEIGHTS)
+        weights = self.character_weights_map.get(character.id, GENRE_DEFAULT.effective_stat_weights())
 
         # 副词条收益统计
         for sub_stat in artifact.sub_stats:
@@ -57,11 +58,11 @@ class StatBasedEvaluator(BaseEvaluator):
             # 计算词条收益
             if clac_type in benefit_dict.keys():
                 weight = 100 if weights.get(clac_type, 0) > 0 else 0
-                benefit = sub_stat.stat_value * weight / base_prop / benefit_dict[clac_type]
+                effective_roll = sub_stat.stat_value * weight / base_prop / benefit_dict[clac_type]
             else:
-                benefit = 0.0
+                effective_roll = 0.0
 
-            result.stat_benefits[sub_stat.stat_type] = round(benefit, 1)
+            result.effective_rolls_dict[sub_stat.stat_type] = round(effective_roll, 1)
 
         # 计算总分
         result.score = round(result.score, 0)
@@ -74,6 +75,7 @@ class StatBasedEvaluator(BaseEvaluator):
         artifact_evals = [self.evaluate_artifact(aft, character, benefit_dict, algorithm)
                           for aft in character.artifacts]
         result.total_score = sum(aft.score for aft in artifact_evals)
+        result.total_effective_rolls = sum(aft.effective_rolls for aft in artifact_evals)
         result.artifacts = artifact_evals
         return result
 

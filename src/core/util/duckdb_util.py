@@ -1,3 +1,5 @@
+# duckdb_util
+
 import json
 from dataclasses import dataclass, asdict
 from typing import Type, Dict, TypeVar, List, Any, get_type_hints

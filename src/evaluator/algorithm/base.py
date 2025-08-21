@@ -1,20 +1,11 @@
 import httpx
 
 from src.core.util.http_util import fetch_and_parse
-from src.enka.model.stat import StatType
 from src.evaluator.config.constants import APP_ID, APP_KEY, CLASS_CHARACTER_STAT_WEIGHT, LEANCLOUD_BASE_URL
 from src.evaluator.stage.leancloud_parser import LeanCloudParser
 
 
 class BaseEvaluator:
-
-    DEFAULT_CHARACTER_WEIGHTS = {
-        StatType.CRIT_RATE: 1,  # 暴击率
-        StatType.CRIT_DMG: 1,  # 暴击伤害
-        StatType.ATK_PERCENT: 1,  # 攻击百分比
-        StatType.ATK: 1,  # 攻击力
-        StatType.ELEMENTAL_CHARGE: 1,  # 充能效率
-    }
 
     def __init__(self):
         self.character_weights_map = {}

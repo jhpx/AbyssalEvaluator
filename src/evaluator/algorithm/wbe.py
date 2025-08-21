@@ -8,6 +8,7 @@ from src.enka.model.player import Player
 from src.enka.model.stat import StatType
 from src.evaluator.algorithm.base import BaseEvaluator
 from src.evaluator.model.eval_model import CharacterEval, ArtifactEval
+from src.evaluator.model.genre import Genre, CRIT, GENRE_DEFAULT
 
 # 定义每个圣遗物词条的系数（小助手公式）
 XZS_ARTIFACT_STAT_FACTORS = MappingProxyType({
@@ -58,7 +59,7 @@ class WeightBasedEvaluator(BaseEvaluator):
             float: 圣遗物的总评分。
         """
         result = ArtifactEval(artifact)
-        weights = self.character_weights_map.get(character.id, self.DEFAULT_CHARACTER_WEIGHTS)
+        weights = self.character_weights_map.get(character.id, GENRE_DEFAULT.effective_stat_weights())
 
         # 副词条评分
         for sub_stat in artifact.sub_stats:

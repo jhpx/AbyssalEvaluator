@@ -1,3 +1,5 @@
+# constants.py
+
 from enum import StrEnum
 from typing import Literal
 
