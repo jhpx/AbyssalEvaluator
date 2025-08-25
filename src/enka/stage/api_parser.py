@@ -165,6 +165,9 @@ class EnkaParser:
     @staticmethod
     def parse_player(data: dict, asset_map: dict) -> Player:
         """解析玩家信息"""
+        if not asset_map:
+            raise ValueError("asset_map is empty, please do fetch_assets() first!")
+
         player_data = data.get("playerInfo", {})
 
         # 解析角色列表
@@ -184,7 +187,7 @@ class EnkaParser:
             level=player_data.get("level", 1),
             world_level=player_data.get("worldLevel", 0),
             name_card_id=name_card_id,
-            name_card=asset_map["namecard"].get(name_card_id),
+            name_card=asset_map["name_card"].get(name_card_id),
             profile_icon_id=profile_icon_id,
             profile_icon=asset_map["pfp"].get(profile_icon_id),
             finish_achievement_num=player_data.get("finishAchievementNum", 0),

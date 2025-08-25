@@ -2,7 +2,6 @@ class EnkaApi:
     ENKA_API_BASE = "https://enka.network/api"
     ENKA_API_DOCS_BASE = "https://raw.githubusercontent.com/EnkaNetwork/API-docs/master/store"
 
-    FILE_LOC = "loc"
     @classmethod
     def get_player_url(cls, uid: str) -> str:
         """
@@ -50,3 +49,14 @@ class EnkaApi:
         :return:
         """
         return cls.ENKA_API_DOCS_BASE + "/pfps.json"
+
+    @classmethod
+    def get_url(cls, name: str) -> str:
+        url_dict = {
+            "character": cls.get_character_json,
+            "name_card": cls.get_name_card_json,
+            "pfp": cls.get_pfp_json,
+            "loc": cls.get_loc_json,
+            "affix": cls.get_affix_json
+        }
+        return url_dict[name]()

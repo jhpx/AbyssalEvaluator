@@ -23,7 +23,7 @@ class EnkaAssetParser:
     def parse_character_meta(data: dict) -> list[CharacterMeta]:
         """解析角色相关的词汇表"""
 
-        return [CharacterMeta(
+        character_metas = [CharacterMeta(
             id=int(cid.replace("-", "")),
             name_text_hash=str(cdata.get("NameTextMapHash")),
             element=cdata.get("Element"),
@@ -35,3 +35,15 @@ class EnkaAssetParser:
             skill_names=cdata.get("Skills"),
             proud_map=cdata.get("ProudMap")
         ) for cid, cdata in data.items()]
+
+        return character_metas
+
+    @classmethod
+    def parse(cls, name: str, data, lang):
+        parse_dict = {
+            "character": cls.parse_character_meta,
+            "name_card": cls.parse_name_card,
+            "pfp": cls.parse_pfp,
+            "loc": lambda data: cls.parse_loc(data, lang),
+        }
+        return parse_dict[name](data)

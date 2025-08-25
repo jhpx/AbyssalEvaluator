@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "682232b2492e2e401f0f41794152c7ff7668de22f391946b8089c612591722c5"
+            "sha256": "fc3595652cdff21373a27fdb46ef592a2bb3e1680fead849fc6c1a3d3fc0eda1"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -32,15 +32,6 @@
             ],
             "markers": "python_version >= '3.7'",
             "version": "==2025.6.15"
-        },
-        "dacite": {
-            "hashes": [
-                "sha256:053f7c3f5128ca2e9aceb66892b1a3c8936d02c686e707bee96e19deef4bc4a0",
-                "sha256:6ccc3b299727c7aa17582f0021f6ae14d5de47c7227932c47fec4cdfefd26f09"
-            ],
-            "index": "pypi",
-            "markers": "python_version >= '3.7'",
-            "version": "==1.9.2"
         },
         "duckdb": {
             "hashes": [

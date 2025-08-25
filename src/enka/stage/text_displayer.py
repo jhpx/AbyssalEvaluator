@@ -103,9 +103,10 @@ class EnkaTextDisplayer:
 
         # 添加总评分与总词条数
         if isinstance(character, CharacterEval):
-            info_parts.append(
-                f"Total Score: {character.total_score:.1f} | Total EffectiveRolls: {character.total_effective_rolls:.1f}")
-
+            eval_result = f"Total Score: {character.total_score:.1f}"
+            if character.total_effective_rolls != 0:
+                eval_result += f" | Total EffectiveRolls: {character.total_effective_rolls:.1f}"
+            info_parts.append(eval_result)
 
         return "\n".join(info_parts)
 
@@ -147,7 +148,9 @@ class EnkaTextDisplayer:
         # 构建圣遗物信息
         info_title = f"  {aft.equipment_type.mv_value(1)}: {aft.set_name} {'★' * aft.rank} (Lv.{aft.level})"
         if isinstance(aft, ArtifactEval):
-            info_title += f" | Score: {aft.score:.1f} | EffectiveRolls: {aft.effective_rolls:.1f}"
+            info_title += f" | Score: {aft.score:.1f}"
+            if aft.effective_rolls_dict:
+                info_title += f"| EffectiveRolls: {aft.effective_rolls:.1f}"
 
         info_stat = f"  Stats: "
         # 添加主属性
@@ -160,7 +163,7 @@ class EnkaTextDisplayer:
             for stat in aft.sub_stats]
 
         info_stat += f"{main_stat_name} {aft.main_stat.stat_value_str}, " + ", ".join(sub_stats_desc)
-        if isinstance(aft, ArtifactEval):
+        if isinstance(aft, ArtifactEval) and aft.effective_rolls_dict:
             effective_rolls_desc = [
                 f"{loc_map.get(stat.stat_type.value)} {aft.effective_rolls_dict[stat.stat_type.value]:.1f}"
                 for stat in aft.sub_stats]

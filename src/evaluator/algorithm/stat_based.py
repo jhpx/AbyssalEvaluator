@@ -2,37 +2,35 @@
 
 from types import MappingProxyType
 
-from src.enka.config.prop_stat import FightPropType
+from src.enka.config.prop_stat import FightPropType, SUB_STAT_ID_MAP
 from src.enka.model.artifact import Artifact
 from src.enka.model.character import Character
 from src.enka.model.player import Player
 from src.enka.model.stat import StatType, FIX_STAT_TYPES
-from src.evaluator.algorithm.base import BaseEvaluator
+from src.evaluator.model.character_stat_weight import CharacterStatWeight
 from src.evaluator.model.eval_model import CharacterEval, ArtifactEval
 from src.evaluator.model.genre import GENRE_DEFAULT
 
-# 定义每个圣遗物词条的标准收益（默认）
-ARTIFACT_STAT_BENEFIT = MappingProxyType({
-    StatType.CRIT_RATE: 3.3,  # 暴击率
-    StatType.CRIT_DMG: 6.6,  # 暴击伤害
-    StatType.ATK_PERCENT: 4.975,  # 攻击百分比
-    StatType.HP_PERCENT: 4.975,  # 生命百分比
-    StatType.DEF_PERCENT: 6.2,  # 防御百分比
-    StatType.ELEMENTAL_MASTERY: 19.75,  # 元素精通
-    StatType.ELEMENTAL_CHARGE: 5.5,  # 充能效率
-})
 
-
-class StatBasedEvaluator(BaseEvaluator):
+class YSINAlgorithm:
     """词条统计法实现圣遗物评分：如YSIN
 
     YSIN的词条评分算法是：圣遗物得分 = 目前圣遗物词条数 / 默认圣遗物词条数 * 100
     词条标准收益
     """
+    # 定义每个圣遗物词条的标准收益（默认）
+    __SUB_STAT_BENEFIT = MappingProxyType({
+        StatType.CRIT_RATE: 3.3,  # 暴击率
+        StatType.CRIT_DMG: 6.6,  # 暴击伤害
+        StatType.ATK_PERCENT: 4.975,  # 攻击百分比
+        StatType.HP_PERCENT: 4.975,  # 生命百分比
+        StatType.DEF_PERCENT: 6.2,  # 防御百分比
+        StatType.ELEMENTAL_MASTERY: 19.75,  # 元素精通
+        StatType.ELEMENTAL_CHARGE: 5.5,  # 充能效率
+    })
 
     def evaluate_artifact(self, artifact: Artifact, character: Character,
-                          benefit_dict: dict = ARTIFACT_STAT_BENEFIT,
-                          algorithm: str = "ysin") -> ArtifactEval:
+                          weight_map: dict[int, CharacterStatWeight]) -> ArtifactEval:
         """
         根据预设的权重计算圣遗物的总评分。
 
@@ -42,7 +40,8 @@ class StatBasedEvaluator(BaseEvaluator):
             float: 圣遗物的总评分。
         """
         result = ArtifactEval(artifact)
-        weights = self.character_weights_map.get(character.id, GENRE_DEFAULT.effective_stat_weights())
+        weights = weight_map.get(
+            character.id).to_dict() if character.id in weight_map else GENRE_DEFAULT.effective_stat_weights()
 
         # 副词条收益统计
         for sub_stat in artifact.sub_stats:
@@ -56,9 +55,9 @@ class StatBasedEvaluator(BaseEvaluator):
             else:
                 base_prop = 100.0
             # 计算词条收益
-            if clac_type in benefit_dict.keys():
+            if clac_type in self.__SUB_STAT_BENEFIT.keys():
                 weight = 100 if weights.get(clac_type, 0) > 0 else 0
-                effective_roll = sub_stat.stat_value * weight / base_prop / benefit_dict[clac_type]
+                effective_roll = sub_stat.stat_value * weight / base_prop / self.__SUB_STAT_BENEFIT[clac_type]
             else:
                 effective_roll = 0.0
 
@@ -69,17 +68,15 @@ class StatBasedEvaluator(BaseEvaluator):
 
         return result
 
-    def evaluate_character(self, character: Character, benefit_dict: dict = ARTIFACT_STAT_BENEFIT,
-                           algorithm: str = "ysin") -> CharacterEval:
+    def evaluate_character(self, character: Character, weight_map: dict[int, CharacterStatWeight]) -> CharacterEval:
         result = CharacterEval(character)
-        artifact_evals = [self.evaluate_artifact(aft, character, benefit_dict, algorithm)
+        artifact_evals = [self.evaluate_artifact(aft, character, weight_map)
                           for aft in character.artifacts]
         result.total_score = sum(aft.score for aft in artifact_evals)
         result.total_effective_rolls = sum(aft.effective_rolls for aft in artifact_evals)
         result.artifacts = artifact_evals
         return result
 
-    def evaluate_player(self, player: Player, benefit_dict: dict = ARTIFACT_STAT_BENEFIT,
-                        algorithm: str = "ysin"):
+    def evaluate_player(self, player: Player, weight_map: dict[int, CharacterStatWeight]):
         """计算玩家角色携带的所有圣遗物"""
-        player.characters = [self.evaluate_character(c, benefit_dict, algorithm) for c in player.characters]
+        player.characters = [self.evaluate_character(c, weight_map) for c in player.characters]

@@ -22,37 +22,6 @@ class EnkaClient:
         self._db = DuckDBSession()
         self._asset_map = {}
         self._player = None
-        # 定义资源配置
-        self._asset_configs = {
-            "loc": {
-                "name": "loc",
-                "url": TestEnkaApi.get_loc_json(),
-                "parser": lambda data: EnkaAssetParser.parse_loc(data, self._lang),
-                "sync_func": EnkaAssetSynchronizer.sync_loc,
-                "get_func": EnkaAssetSynchronizer.get_loc
-            },
-            "namecard": {
-                "name": "namecard",
-                "url": TestEnkaApi.get_name_card_json(),
-                "parser": EnkaAssetParser.parse_name_card,
-                "sync_func": EnkaAssetSynchronizer.sync_name_card,
-                "get_func": EnkaAssetSynchronizer.get_name_card
-            },
-            "pfp": {
-                "name": "pfp",
-                "url": TestEnkaApi.get_pfp_json(),
-                "parser": EnkaAssetParser.parse_pfp,
-                "sync_func": EnkaAssetSynchronizer.sync_pfp,
-                "get_func": EnkaAssetSynchronizer.get_pfp
-            },
-            "character": {
-                "name": "character",
-                "url": TestEnkaApi.get_character_json(),
-                "parser": EnkaAssetParser.parse_character_meta,
-                "sync_func": EnkaAssetSynchronizer.sync_character_meta,
-                "get_func": EnkaAssetSynchronizer.get_character_meta
-            }
-        }
 
     def _convert_lang(self, lang: Language | str) -> Language:
         """针对不支持的语言报错"""
@@ -68,28 +37,29 @@ class EnkaClient:
 
     async def fetch_assets(self):
         """从enka获取最新的静态资源"""
-
-        for name, config in self._asset_configs.items():
+        for name in ("character", "name_card", "pfp", "loc"):
             data = await fetch_and_parse(
                 client=self._client,
-                url=config["url"],
-                parser=config["parser"]
+                url=TestEnkaApi.get_url(name),
+                parser=lambda data: EnkaAssetParser.parse(name, data, self._lang)
             )
-            config["sync_func"](data, self._db)
-            self._asset_map[name] = config["get_func"](self._db)
+            # 同步入库并从数据库重新载入缓存
+            EnkaAssetSynchronizer.sync(name, data, self._db)
+            self._asset_map[name] = EnkaAssetSynchronizer.get(name, self._db)
 
         return self._asset_map
 
     async def refresh_asset(self, name):
         """从本地数据库获取静态资源"""
-        if name not in self._asset_map.keys():
-            self._asset_map[name] = self._asset_configs[name]["get_func"](self._db)
+        data = EnkaAssetSynchronizer.get(name, self._db)
+        if data:
+            self._asset_map[name] = data
         return
 
     async def refresh_assets(self):
         """从本地数据库获取静态资源"""
         await self.refresh_asset("loc")
-        await self.refresh_asset("namecard")
+        await self.refresh_asset("name_card")
         await self.refresh_asset("pfp")
         await self.refresh_asset("character")
         return
@@ -125,7 +95,7 @@ class EnkaClient:
 
         :return: 本地化的字符串表示
         """
-        return EnkaTextDisplayer.display_player(self._player,self._asset_map["loc"])
+        return EnkaTextDisplayer.display_player(self._player, self._asset_map["loc"])
 
     def info_character(self, character_name: str) -> str:
         """
@@ -135,5 +105,12 @@ class EnkaClient:
         :return: 本地化的字符串表示
         """
         character = next((char for char in self._player.characters if char.name == character_name), None)
-        return EnkaTextDisplayer.display_character(character,self._asset_map["loc"])
+        return EnkaTextDisplayer.display_character(character, self._asset_map["loc"])
 
+    @property
+    def client(self):
+        return self._client
+
+    @property
+    def db(self):
+        return self._db
