@@ -2,14 +2,11 @@
 
 from types import MappingProxyType
 
-from src.enka.config.prop_stat import FightPropType, SUB_STAT_ID_MAP
+from src.enka.config.prop_stat import FightPropType
 from src.enka.model.artifact import Artifact
 from src.enka.model.character import Character
-from src.enka.model.player import Player
 from src.enka.model.stat import StatType, FIX_STAT_TYPES
-from src.evaluator.model.character_stat_weight import CharacterStatWeight
 from src.evaluator.model.eval_model import CharacterEval, ArtifactEval
-from src.evaluator.model.genre import GENRE_DEFAULT
 
 
 class YSINAlgorithm:
@@ -18,6 +15,8 @@ class YSINAlgorithm:
     YSIN的词条评分算法是：圣遗物得分 = 目前圣遗物词条数 / 默认圣遗物词条数 * 100
     词条标准收益
     """
+    REMOTE_WEIGHT_TABLE = "CharacterStatWeight_XZS"
+
     # 定义每个圣遗物词条的标准收益（默认）
     __SUB_STAT_BENEFIT = MappingProxyType({
         StatType.CRIT_RATE: 3.3,  # 暴击率
@@ -30,7 +29,7 @@ class YSINAlgorithm:
     })
 
     def evaluate_artifact(self, artifact: Artifact, character: Character,
-                          weight_map: dict[int, CharacterStatWeight]) -> ArtifactEval:
+                          weights: dict[StatType, int]) -> ArtifactEval:
         """
         根据预设的权重计算圣遗物的总评分。
 
@@ -40,8 +39,6 @@ class YSINAlgorithm:
             float: 圣遗物的总评分。
         """
         result = ArtifactEval(artifact)
-        weights = weight_map.get(
-            character.id).to_dict() if character.id in weight_map else GENRE_DEFAULT.effective_stat_weights()
 
         # 副词条收益统计
         for sub_stat in artifact.sub_stats:
@@ -68,15 +65,12 @@ class YSINAlgorithm:
 
         return result
 
-    def evaluate_character(self, character: Character, weight_map: dict[int, CharacterStatWeight]) -> CharacterEval:
+    def evaluate_character(self, character: Character, weights: dict[StatType, int]) -> CharacterEval:
+
         result = CharacterEval(character)
-        artifact_evals = [self.evaluate_artifact(aft, character, weight_map)
+        artifact_evals = [self.evaluate_artifact(aft, character, weights)
                           for aft in character.artifacts]
         result.total_score = sum(aft.score for aft in artifact_evals)
         result.total_effective_rolls = sum(aft.effective_rolls for aft in artifact_evals)
         result.artifacts = artifact_evals
         return result
-
-    def evaluate_player(self, player: Player, weight_map: dict[int, CharacterStatWeight]):
-        """计算玩家角色携带的所有圣遗物"""
-        player.characters = [self.evaluate_character(c, weight_map) for c in player.characters]

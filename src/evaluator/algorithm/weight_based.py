@@ -4,13 +4,8 @@ from types import MappingProxyType
 
 from src.enka.model.artifact import Artifact
 from src.enka.model.character import Character
-from src.enka.model.player import Player
 from src.enka.model.stat import StatType
-from src.evaluator.model.character_stat_weight import CharacterStatWeight
 from src.evaluator.model.eval_model import CharacterEval, ArtifactEval
-from src.evaluator.model.genre import GENRE_DEFAULT
-
-
 
 
 class XZSAlgorithm:
@@ -18,6 +13,7 @@ class XZSAlgorithm:
 
     小助手的评分算法是：副词条得分 = 数值 * 均衡乘数 * 角色收益权重，圣遗物得分为副词条得分之和，如果头冠是暴击/爆伤，加20分
     """
+    REMOTE_WEIGHT_TABLE = "CharacterStatWeight_XZS"
 
     # 定义每个圣遗物词条的系数（小助手公式）
     __XZS_ARTIFACT_STAT_FACTORS = MappingProxyType({
@@ -51,7 +47,7 @@ class XZSAlgorithm:
         self.factor_dict = self.__XZS_ARTIFACT_STAT_FACTORS
 
     def evaluate_artifact(self, artifact: Artifact, character: Character,
-                          weight_map: dict[int, CharacterStatWeight]) -> ArtifactEval:
+                          weights: dict[StatType, int]) -> ArtifactEval:
         """
         根据预设的权重计算圣遗物的总评分。
 
@@ -61,14 +57,12 @@ class XZSAlgorithm:
             float: 圣遗物的总评分。
         """
         result = ArtifactEval(artifact)
-        weights = weight_map.get(
-            character.id).to_dict() if character.id in weight_map else GENRE_DEFAULT.effective_stat_weights()
 
         # 副词条评分
         for sub_stat in artifact.sub_stats:
             if sub_stat.stat_type in self.factor_dict.keys():
                 result.score += round(sub_stat.stat_value * self.factor_dict[sub_stat.stat_type]
-                                      * weights.get(sub_stat.stat_type, 0) / 100, 0)
+                                      * weights.get(sub_stat.stat_type, 0) / 100, 1)
 
         result.score = round(result.score, 0)
         if artifact.main_stat.stat_type in [StatType.CRIT_DMG, StatType.CRIT_RATE]:
@@ -76,14 +70,10 @@ class XZSAlgorithm:
 
         return result
 
-    def evaluate_character(self, character: Character, weight_map: dict[int, CharacterStatWeight]) -> CharacterEval:
+    def evaluate_character(self, character: Character, weights: dict[StatType, int]) -> CharacterEval:
         result = CharacterEval(character)
-        artifact_evals = [self.evaluate_artifact(aft, character, weight_map)
+        artifact_evals = [self.evaluate_artifact(aft, character, weights)
                           for aft in character.artifacts]
         result.total_score = sum(aft.score for aft in artifact_evals)
         result.artifacts = artifact_evals
         return result
-
-    def evaluate_player(self, player: Player, weight_map: dict[int, CharacterStatWeight]):
-        """计算玩家角色携带的所有圣遗物"""
-        player.characters = [self.evaluate_character(c, weight_map) for c in player.characters]

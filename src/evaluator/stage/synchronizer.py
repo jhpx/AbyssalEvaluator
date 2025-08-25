@@ -17,9 +17,23 @@ class LeanCloudSynchronizer:
         sync_list_to_duckdb(data, LeanCloudSynchronizer.TABLE_CHARACTER_STAT_WEIGHT_YM, db, overwrite=False)
 
     @classmethod
+    def sync(cls, name: str, data, db: DuckDBSession):
+        sync_dict = {
+            "XZSAlgorithm": cls.sync_character_stat_weight_xzs,
+            "YSINAlgorithm": cls.sync_character_stat_weight_ym,
+        }
+        return sync_dict[name](data, db)
+    @classmethod
     def get_character_stat_weight_xzs(cls, db: DuckDBSession) -> dict[int, CharacterStatWeight]:
         return rows_into_model_dict(db.extract_table(cls.TABLE_CHARACTER_STAT_WEIGHT_XZS), CharacterStatWeight)
 
     @classmethod
     def get_character_stat_weight_ym(cls, db: DuckDBSession) -> dict[int, CharacterStatWeight]:
         return rows_into_model_dict(db.extract_table(cls.TABLE_CHARACTER_STAT_WEIGHT_YM), CharacterStatWeight)
+    @classmethod
+    def get(cls, name: str, db: DuckDBSession):
+        get_dict = {
+            "XZSAlgorithm": cls.get_character_stat_weight_xzs,
+            "YSINAlgorithm": cls.get_character_stat_weight_ym,
+        }
+        return get_dict[name](db)
