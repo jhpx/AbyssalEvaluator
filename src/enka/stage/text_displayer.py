@@ -146,9 +146,10 @@ class EnkaTextDisplayer:
         # 构建圣遗物信息
         info_title = f"  {aft.equipment_type.mv_value(1)}: {aft.set_name} {'★' * aft.rank} (Lv.{aft.level})"
         if isinstance(aft, ArtifactEval):
-            info_title += f" | Score: {aft.score:.1f}"
+            if aft.score > 0:
+                info_title += f" | Score: {aft.score:.1f}"
             if aft.effective_rolls_dict:
-                info_title += f"| EffectiveRolls: {aft.effective_rolls:.1f}"
+                info_title += f" | EffectiveRolls: {aft.effective_rolls:.1f}"
 
         info_stat = f"  Stats: "
         # 添加主属性
