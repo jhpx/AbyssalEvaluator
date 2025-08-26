@@ -31,7 +31,7 @@ async def fetch_and_parse(
     if url.startswith("http"):
         raw_data = await fetch_http_json(client, url, headers, params)
     else:
-        raw_data = await fetch_local_json(url)
+        raw_data = fetch_local_json(url)
 
     if not raw_data:
         logger.error(f"无法获取数据:{url}")
@@ -56,7 +56,7 @@ async def fetch_http_json(client: httpx.AsyncClient, url: str, headers=None, par
         return {}
 
 
-async def fetch_local_json(file_path: str) -> Dict:
+def fetch_local_json(file_path: str) -> Dict:
     logger.info(f"使用本地文件地址: {file_path}")
     try:
         with open(file_path, 'r', encoding='utf-8') as f:

@@ -49,19 +49,19 @@ class EnkaClient:
 
         return self._asset_map
 
-    async def refresh_asset(self, name):
+    def refresh_asset(self, name):
         """从本地数据库获取静态资源"""
         data = EnkaAssetSynchronizer.get(name, self._db)
         if data:
             self._asset_map[name] = data
         return
 
-    async def refresh_assets(self):
+    def refresh_assets(self):
         """从本地数据库获取静态资源"""
-        await self.refresh_asset("loc")
-        await self.refresh_asset("name_card")
-        await self.refresh_asset("pfp")
-        await self.refresh_asset("character")
+        self.refresh_asset("loc")
+        self.refresh_asset("name_card")
+        self.refresh_asset("pfp")
+        self.refresh_asset("character")
         return
 
     async def fetch_player(self, uid: str) -> Optional[Player]:
@@ -71,7 +71,7 @@ class EnkaClient:
         :param uid: 玩家 UID
         :return: Player 实例 或 None
         """
-        await self.refresh_assets()
+        self.refresh_assets()
         self._player = await fetch_and_parse(
             client=self._client,
             url=TestEnkaApi.get_player_url(uid),
@@ -79,7 +79,7 @@ class EnkaClient:
         )
         return self._player
 
-    async def refresh_player(self):
+    def refresh_player(self):
         """
         从本地数据库获取玩家信息
 
