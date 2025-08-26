@@ -7,6 +7,7 @@ from src.enka.model.artifact import Artifact
 from src.enka.model.character import Character
 from src.enka.model.stat import StatType, FIX_STAT_TYPES
 from src.evaluator.model.eval_model import CharacterEval, ArtifactEval
+from src.evaluator.model.genre import Genre
 
 
 class YSINAlgorithm:
@@ -29,7 +30,7 @@ class YSINAlgorithm:
     })
 
     def evaluate_artifact(self, artifact: Artifact, character: Character,
-                          weights: dict[StatType, int]) -> ArtifactEval:
+                          genre: Genre) -> ArtifactEval:
         """
         根据预设的权重计算圣遗物的总评分。
 
@@ -46,31 +47,31 @@ class YSINAlgorithm:
             # 固定词条折算成百分比词条
             if clac_type in FIX_STAT_TYPES:
                 prop_type = FightPropType.from_name(clac_type.value.replace("PROP_", "PROP_BASE_"))
-                base_prop = character.fight_prop.get(prop_type)
+                base_prop = character.fight_prop.get(prop_type) / 100.0
                 # 利用名称构造枚举
                 clac_type = StatType.from_name(clac_type.name + "_PERCENT")
             else:
-                base_prop = 100.0
-            # 计算词条收益
-            if clac_type in self.__SUB_STAT_BENEFIT.keys():
-                weight = 100 if weights.get(clac_type, 0) > 0 else 0
+                base_prop = 1
+            # 计算有效词条数
+            if clac_type in self.__SUB_STAT_BENEFIT.keys() and clac_type in genre.effective_stats:
+                weight = genre.effective_stat_weight(clac_type)
                 effective_roll = sub_stat.stat_value * weight / base_prop / self.__SUB_STAT_BENEFIT[clac_type]
             else:
                 effective_roll = 0.0
-
-            result.effective_rolls_dict[sub_stat.stat_type] = round(effective_roll, 1)
-
-        # 计算总分
-        result.score = round(result.score, 0)
+            result.effective_rolls_dict[sub_stat.stat_type] = round(effective_roll, 2)
 
         return result
 
     def evaluate_character(self, character: Character, weights: dict[StatType, int]) -> CharacterEval:
 
         result = CharacterEval(character)
-        artifact_evals = [self.evaluate_artifact(aft, character, weights)
+        result.genre = Genre.from_weights(weights)
+        artifact_evals = [self.evaluate_artifact(aft, character, result.genre)
                           for aft in character.artifacts]
-        result.total_score = sum(aft.score for aft in artifact_evals)
         result.total_effective_rolls = sum(aft.effective_rolls for aft in artifact_evals)
+        total_effective_rolls_clac = sum(aft.effective_rolls_clac(result.genre) for aft in artifact_evals)
+
+        # 计算总分
+        result.total_score = round(total_effective_rolls_clac * 100 / result.genre.default_effective_rolls(), 2)
         result.artifacts = artifact_evals
         return result

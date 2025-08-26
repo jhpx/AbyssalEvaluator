@@ -53,15 +53,14 @@ class Evaluator:
     def evaluate_player(self, player: Player):
         """计算玩家角色携带的所有圣遗物"""
         self.refresh_weights()
-        player.characters = [self.evaluate_character(c, self._character_weights_map) for c in
-                             player.characters]
+        player.characters = [self.evaluate_character(c) for c in player.characters]
         return
 
-    def evaluate_character(self, character: Character, weight_map: dict[int, CharacterStatWeight]):
+    def evaluate_character(self, character: Character):
         """计算角色携带的所有圣遗物"""
-        if character.id in weight_map:
-            weights = weight_map.get(character.id).to_dict()
-        elif weight_map:
+        if character.id in self._character_weights_map:
+            weights = self._character_weights_map.get(character.id).to_dict()
+        elif self._character_weights_map:
             weights = GENRE_DEFAULT.effective_stat_weights()
         else:
             raise ValueError("没有找到角色权重")
