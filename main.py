@@ -25,11 +25,11 @@ async def main() -> None:
         player = await api.fetch_player("101242308")
         ev = Evaluator(api, YSINAlgorithm())
         # ev = Evaluator(api, XZSAlgorithm())
-        # await ev.fetch_character_weights()
-        # ev.evaluate_player(player)
+        await ev.fetch_character_weights()
+        # ev.refresh_weights()
+        ev.evaluate_player(player)
         # print(api.info_player())
-        ev.refresh_weights()
-        player.characters[5] = ev.evaluate_character(player.characters[5])
+        # player.characters[5] = ev.evaluate_character(player.characters[5])
         print(api.info_character("神里绫华"))
     return None
 

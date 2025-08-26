@@ -8,7 +8,7 @@ class CharacterStatWeight:
     # 角色ID
     id: int
     # 角色名称
-    name: str
+    character: str
     # 属性
     hp_percent: int
     attack_percent: int

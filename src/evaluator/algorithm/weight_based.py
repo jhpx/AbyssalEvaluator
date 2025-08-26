@@ -1,5 +1,5 @@
 # wbe.py
-
+from decimal import Decimal
 from types import MappingProxyType
 
 from src.enka.model.artifact import Artifact
@@ -17,30 +17,30 @@ class XZSAlgorithm:
 
     # 定义每个圣遗物词条的系数（小助手公式）
     __XZS_ARTIFACT_STAT_FACTORS = MappingProxyType({
-        StatType.CRIT_RATE: 2.0,  # 暴击率
-        StatType.CRIT_DMG: 1.0,  # 暴击伤害
-        StatType.ATK_PERCENT: 1.33,  # 攻击百分比
-        StatType.HP_PERCENT: 1.33,  # 生命百分比
-        StatType.DEF_PERCENT: 1.06,  # 防御百分比
-        StatType.ATK: 0.398 * 0.5,  # 攻击力 0.199
-        StatType.HP: 0.026 * 0.66,  # 生命值 0.01716
-        StatType.DEF: 0.335 * 0.66,  # 防御力 0.2211
-        StatType.ELEMENTAL_MASTERY: 0.33,  # 元素精通
-        StatType.ELEMENTAL_CHARGE: 1.1979,  # 充能效率
+        StatType.CRIT_RATE: Decimal(2.0),  # 暴击率
+        StatType.CRIT_DMG: Decimal(1.0),  # 暴击伤害
+        StatType.ATK_PERCENT: Decimal(1.33),  # 攻击百分比
+        StatType.HP_PERCENT: Decimal(1.33),  # 生命百分比
+        StatType.DEF_PERCENT: Decimal(1.06),  # 防御百分比
+        StatType.ATK: Decimal(0.398) * Decimal(0.5),  # 攻击力 0.199
+        StatType.HP: Decimal(0.026) * Decimal(0.66),  # 生命值 0.01716
+        StatType.DEF: Decimal(0.335) * Decimal(0.66),  # 防御力 0.2211
+        StatType.ELEMENTAL_MASTERY: Decimal(0.33),  # 元素精通
+        StatType.ELEMENTAL_CHARGE: Decimal(1.1979),  # 充能效率
     })
 
     # 定义每个圣遗物词条的系数（刻晴办公桌公式）
     __KEQING_ARTIFACT_STAT_FACTORS = MappingProxyType({
-        StatType.CRIT_RATE: 2.0,  # 暴击率
-        StatType.CRIT_DMG: 1.0,  # 暴击伤害
-        StatType.ATK_PERCENT: 1.331429,  # 攻击百分比
-        StatType.HP_PERCENT: 1.331429,  # 生命百分比
-        StatType.DEF_PERCENT: 1.066362,  # 防御百分比
-        StatType.ATK: 0.199146,  # 攻击力
-        StatType.HP: 0.012995,  # 生命值
-        StatType.DEF: 0.162676,  # 防御力
-        StatType.ELEMENTAL_MASTERY: 0.332857,  # 元素精通
-        StatType.ELEMENTAL_CHARGE: 1.197943,  # 充能效率
+        StatType.CRIT_RATE: Decimal(2.0),  # 暴击率
+        StatType.CRIT_DMG: Decimal(1.0),  # 暴击伤害
+        StatType.ATK_PERCENT: Decimal(1.331429),  # 攻击百分比
+        StatType.HP_PERCENT: Decimal(1.331429),  # 生命百分比
+        StatType.DEF_PERCENT: Decimal(1.066362),  # 防御百分比
+        StatType.ATK: Decimal(0.199146),  # 攻击力
+        StatType.HP: Decimal(0.012995),  # 生命值
+        StatType.DEF: Decimal(0.162676),  # 防御力
+        StatType.ELEMENTAL_MASTERY: Decimal(0.332857),  # 元素精通
+        StatType.ELEMENTAL_CHARGE: Decimal(1.197943),  # 充能效率
     })
 
     def __init__(self):
@@ -54,15 +54,14 @@ class XZSAlgorithm:
         参数:
             artifact (Artifact): 一个包含圣遗物信息的对象。
         返回:
-            float: 圣遗物的总评分。
+            Decimal: 圣遗物的总评分。
         """
         result = ArtifactEval(artifact)
 
         # 副词条评分
         for sub_stat in artifact.sub_stats:
             if sub_stat.stat_type in self.factor_dict.keys():
-                result.score += round(sub_stat.stat_value * self.factor_dict[sub_stat.stat_type]
-                                      * weights.get(sub_stat.stat_type, 0) / 100, 1)
+                result.score +=  round(sub_stat.stat_value * self.factor_dict[sub_stat.stat_type] * weights.get(sub_stat.stat_type, 0) / 100, 1)
 
         result.score = round(result.score, 0)
         if artifact.main_stat.stat_type in [StatType.CRIT_DMG, StatType.CRIT_RATE]:

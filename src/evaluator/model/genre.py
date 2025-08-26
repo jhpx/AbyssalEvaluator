@@ -1,6 +1,7 @@
 # genre.py
 
 from dataclasses import dataclass
+from decimal import Decimal
 
 from src.enka.model.stat import StatType
 
@@ -50,16 +51,16 @@ class Genre:
         """获取所有属性的权重字典，有效属性为100，无效属性为0"""
         return 1 if stat_type in self.effective_stats else 0
 
-    def clac_stat_weight(self, stat_type: StatType) -> float:
+    def clac_stat_weight(self, stat_type: StatType) -> Decimal:
         """获取所有属性的权重字典，有效属性为100，无效属性为0"""
         if stat_type in {StatType.ELEMENTAL_CHARGE, StatType.ELEMENTAL_MASTERY}:
-            return 0.5
+            return Decimal(0.5)
         elif stat_type in self.effective_stats:
-            return 1.0
+            return Decimal(1.0)
         else:
-            return 0.0
+            return Decimal(0.0)
 
-    def default_effective_rolls(self) -> float:
+    def default_effective_rolls(self) -> int:
         """获取所有属性的默认有效次数"""
         count_stat_set = {
             StatType.HP_PERCENT,

@@ -1,4 +1,5 @@
 # parser.py
+from decimal import Decimal
 
 from src.enka.config.constants import EquipmentType, Element
 from src.enka.config.prop_stat import FightPropType
@@ -25,7 +26,7 @@ class EnkaParser:
         # 解析武器属性（主词条和副词条）
         weapon_stats_data = flat_data.get("weaponStats", [])
         weapon_stats = [
-            Stat(StatType(st.get("appendPropId")), st.get("statValue", 0.0))
+            Stat(StatType(st.get("appendPropId")), Decimal(str(st.get("statValue", 0))))
             for st in weapon_stats_data
         ]
 
@@ -51,12 +52,12 @@ class EnkaParser:
         main_stat_data = flat_data.get("reliquaryMainstat", {})
         main_stat = Stat(
             StatType(main_stat_data.get("mainPropId")),
-            stat_value=main_stat_data.get("statValue", 0.0)
+            stat_value=Decimal(str(main_stat_data.get("statValue", 0.0)))
         )
 
         # 解析副属性
         sub_stats = [
-            Stat(StatType(sub.get("appendPropId")), stat_value=sub.get("statValue", 0.0))
+            Stat(StatType(sub.get("appendPropId")), stat_value=Decimal(str(sub.get("statValue", 0.0))))
             for sub in flat_data.get("reliquarySubstats", [])
         ]
 
@@ -111,7 +112,7 @@ class EnkaParser:
 
         # 解析战斗面板
         fight_prop_map = {
-            FightPropType(int(k)): v
+            FightPropType(int(k)): Decimal(str(v))
             for k, v in data.get("fightPropMap", {}).items()
         }
 

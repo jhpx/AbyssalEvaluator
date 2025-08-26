@@ -1,7 +1,7 @@
 # character.py
 
 from dataclasses import dataclass
-from typing import Optional
+from decimal import Decimal
 
 from src.enka.config.constants import Element
 from src.enka.config.prop_stat import FightPropType
@@ -43,7 +43,7 @@ class Character:
     # 圣遗物
     artifacts: list[Artifact]
     # 面板
-    fight_prop: dict[FightPropType, float]
+    fight_prop: dict[FightPropType, Decimal]
 
     def side_avatar_icon(self) -> str:
         """获取侧脸图标"""

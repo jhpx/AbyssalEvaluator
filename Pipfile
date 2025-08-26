@@ -9,6 +9,7 @@ starlette = "*"
 httpx = "*"
 pyarrow = "*"
 pipdeptree = "*"
+dacite = "*"
 
 [dev-packages]
 

@@ -1,5 +1,3 @@
-from logging import raiseExceptions
-
 from src.enka.config.prop_stat import SUB_STAT_ID_MAP
 from src.enka.model.artifact import Artifact
 from src.enka.model.character import Character

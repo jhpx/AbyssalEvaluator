@@ -10,11 +10,11 @@ class LeanCloudSynchronizer:
 
     @staticmethod
     def sync_character_stat_weight_xzs(data: list[CharacterStatWeight], db: DuckDBSession):
-        sync_list_to_duckdb(data, LeanCloudSynchronizer.TABLE_CHARACTER_STAT_WEIGHT_XZS, db, overwrite=False)
+        sync_list_to_duckdb(data, LeanCloudSynchronizer.TABLE_CHARACTER_STAT_WEIGHT_XZS, db, overwrite=True)
 
     @staticmethod
     def sync_character_stat_weight_ym(data: list[CharacterStatWeight], db: DuckDBSession):
-        sync_list_to_duckdb(data, LeanCloudSynchronizer.TABLE_CHARACTER_STAT_WEIGHT_YM, db, overwrite=False)
+        sync_list_to_duckdb(data, LeanCloudSynchronizer.TABLE_CHARACTER_STAT_WEIGHT_YM, db, overwrite=True)
 
     @classmethod
     def sync(cls, name: str, data, db: DuckDBSession):

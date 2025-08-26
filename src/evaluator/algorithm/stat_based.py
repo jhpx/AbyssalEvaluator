@@ -1,5 +1,5 @@
 # sbe.py
-
+from decimal import Decimal
 from types import MappingProxyType
 
 from src.enka.config.prop_stat import FightPropType
@@ -20,13 +20,13 @@ class YSINAlgorithm:
 
     # 定义每个圣遗物词条的标准收益（默认）
     __SUB_STAT_BENEFIT = MappingProxyType({
-        StatType.CRIT_RATE: 3.3,  # 暴击率
-        StatType.CRIT_DMG: 6.6,  # 暴击伤害
-        StatType.ATK_PERCENT: 4.975,  # 攻击百分比
-        StatType.HP_PERCENT: 4.975,  # 生命百分比
-        StatType.DEF_PERCENT: 6.2,  # 防御百分比
-        StatType.ELEMENTAL_MASTERY: 19.75,  # 元素精通
-        StatType.ELEMENTAL_CHARGE: 5.5,  # 充能效率
+        StatType.CRIT_RATE: Decimal(3.3),  # 暴击率
+        StatType.CRIT_DMG: Decimal(6.6),  # 暴击伤害
+        StatType.ATK_PERCENT: Decimal(5),  # 攻击百分比
+        StatType.HP_PERCENT: Decimal(5),  # 生命百分比
+        StatType.DEF_PERCENT: Decimal(6.2),  # 防御百分比
+        StatType.ELEMENTAL_MASTERY: Decimal(19.75),  # 元素精通
+        StatType.ELEMENTAL_CHARGE: Decimal(5.5),  # 充能效率
     })
 
     def evaluate_artifact(self, artifact: Artifact, character: Character,
@@ -37,7 +37,7 @@ class YSINAlgorithm:
         参数:
             artifact (Artifact): 一个包含圣遗物信息的对象。
         返回:
-            float: 圣遗物的总评分。
+            Decimal: 圣遗物的总评分。
         """
         result = ArtifactEval(artifact)
 
@@ -47,17 +47,17 @@ class YSINAlgorithm:
             # 固定词条折算成百分比词条
             if clac_type in FIX_STAT_TYPES:
                 prop_type = FightPropType.from_name(clac_type.value.replace("PROP_", "PROP_BASE_"))
-                base_prop = character.fight_prop.get(prop_type) / 100.0
+                base_prop = character.fight_prop.get(prop_type) / 100
                 # 利用名称构造枚举
                 clac_type = StatType.from_name(clac_type.name + "_PERCENT")
             else:
-                base_prop = 1
+                base_prop = Decimal(1)
             # 计算有效词条数
             if clac_type in self.__SUB_STAT_BENEFIT.keys() and clac_type in genre.effective_stats:
                 weight = genre.effective_stat_weight(clac_type)
                 effective_roll = sub_stat.stat_value * weight / base_prop / self.__SUB_STAT_BENEFIT[clac_type]
             else:
-                effective_roll = 0.0
+                effective_roll = Decimal(0)
             result.effective_rolls_dict[sub_stat.stat_type] = round(effective_roll, 2)
 
         return result

@@ -1,6 +1,7 @@
 # stat.py
 
 from dataclasses import dataclass
+from decimal import Decimal
 from enum import StrEnum
 
 from src.core.misc.mvenum import FromNameMixin
@@ -50,7 +51,7 @@ class Stat:
     # 属性类型
     stat_type: StatType
     # 属性值
-    stat_value: float
+    stat_value: Decimal
 
     # 属性值转字符串
     @property
