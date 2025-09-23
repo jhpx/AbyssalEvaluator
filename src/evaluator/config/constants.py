@@ -1,3 +1,6 @@
-LEANCLOUD_BASE_URL = "https://4acrnrdw.api.lncldglobal.com"
-APP_ID = "4ACrNrdWr8YmEb3TiDAoKbYH-MdYXbMMI"
-APP_KEY = "1eAqKA6iTZiVabV2NGF9klil"
+CLAW_CLOUD_RUN_BASE_URL = "https://objectstorageapi.ap-northeast-1.clawcloudrun.com"
+ACCESS_KEY = "7pjveg3o"
+SECRET_KEY = "kvl98lc2lshn48jh"
+REGION = 'us-east-1'
+SERVICE = 's3'
+BUCKET = '7pjveg3o-abyssal-evaluator'

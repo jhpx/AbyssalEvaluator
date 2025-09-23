@@ -3,18 +3,18 @@ from src.core.util.duckdb_util import sync_list_to_duckdb, rows_into_model_dict
 from src.evaluator.model.character_stat_weight import CharacterStatWeight
 
 
-class LeanCloudSynchronizer:
+class StatWeightSynchronizer:
     # 表名常量定义
     TABLE_CHARACTER_STAT_WEIGHT_XZS = "ods_character_stat_weight_xzs"
     TABLE_CHARACTER_STAT_WEIGHT_YM = "ods_character_stat_weight_ym"
 
     @staticmethod
     def sync_character_stat_weight_xzs(data: list[CharacterStatWeight], db: DuckDBSession):
-        sync_list_to_duckdb(data, LeanCloudSynchronizer.TABLE_CHARACTER_STAT_WEIGHT_XZS, db, overwrite=True)
+        sync_list_to_duckdb(data, StatWeightSynchronizer.TABLE_CHARACTER_STAT_WEIGHT_XZS, db, overwrite=True)
 
     @staticmethod
     def sync_character_stat_weight_ym(data: list[CharacterStatWeight], db: DuckDBSession):
-        sync_list_to_duckdb(data, LeanCloudSynchronizer.TABLE_CHARACTER_STAT_WEIGHT_YM, db, overwrite=True)
+        sync_list_to_duckdb(data, StatWeightSynchronizer.TABLE_CHARACTER_STAT_WEIGHT_YM, db, overwrite=True)
 
     @classmethod
     def sync(cls, name: str, data, db: DuckDBSession):
