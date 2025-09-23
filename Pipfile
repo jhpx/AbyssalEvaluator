@@ -8,7 +8,6 @@ duckdb = "*"
 starlette = "*"
 httpx = "*"
 pyarrow = "*"
-pipdeptree = "*"
 dacite = "*"
 uvicorn = "*"
 
