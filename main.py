@@ -15,7 +15,7 @@ from src.evaluator.evaluator import Evaluator
 
 
 async def main() -> None:
-    async with EnkaClient("zh-cn", proxy="http://127.0.0.1:4081") as api:
+    async with EnkaClient("zh-cn", proxy="socks5h://127.0.0.1:4080") as api:
         # Update assets
         # await api.fetch_assets()
         # print(await api.get_asset("loc"))

@@ -13,7 +13,7 @@ T = TypeVar("T")
 async def fetch_and_parse(
         client: httpx.AsyncClient,
         url: str,
-        parser: Callable[[dict], T | list[T]],
+        parser: Callable[[any], T | list[T]],
         data_type: str = "json",
         *,
         params=None,

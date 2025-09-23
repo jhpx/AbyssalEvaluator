@@ -6,10 +6,10 @@ name = "pypi"
 [packages]
 duckdb = "*"
 starlette = "*"
-httpx = "*"
 pyarrow = "*"
 dacite = "*"
 uvicorn = "*"
+httpx = {extras = ["socks"], version = "*"}
 
 [dev-packages]
 
