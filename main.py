@@ -1,4 +1,5 @@
 import anyio
+from pathlib import Path
 
 from src.enka.client import EnkaClient
 
@@ -17,20 +18,22 @@ from src.evaluator.evaluator import Evaluator
 async def main() -> None:
     async with EnkaClient("zh-cn", proxy="socks5h://127.0.0.1:4080") as api:
         # Update assets
-        # await api.fetch_assets()
+        # 只有在 data/main.db 不存在时才执行 fetch_assets()
+        if not Path("data/main.db").exists():
+            await api.fetch_assets()
         # print(await api.get_asset("loc"))
         # print(await api.get_asset("namecard"))
         # print(await api.get_asset("pfp"))
         # print(await api.get_asset("character"))
         player = await api.fetch_player("101242308")
         ev = Evaluator(api, YSINAlgorithm())
-        # ev = Evaluator(api, XZSAlgorithm())
+        #ev = Evaluator(api, XZSAlgorithm())
         await ev.fetch_character_weights()
         # ev.refresh_weights()
         ev.evaluate_player(player)
-        # print(api.info_player())
+        print(api.info_player())
         # player.characters[5] = ev.evaluate_character(player.characters[5])
-        print(api.info_character("神里绫华"))
+        # print(api.info_character("神里绫华"))
     return None
 
 

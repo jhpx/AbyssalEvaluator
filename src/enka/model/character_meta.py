@@ -24,3 +24,19 @@ class CharacterMeta:
     skill_names: dict[str, str]
     # 固定天赋
     proud_map: dict[str, int]
+
+    @classmethod
+    def default(cls, id) -> 'CharacterMeta':
+        """创建一个默认的CharacterMeta实例"""
+        return cls(
+            id=id,
+            name_text_hash="",
+            element="unknown",
+            side_avatar_icon="",
+            rank=0,
+            weapon_type="",
+            costume="",
+            skill_order=[],
+            skill_names={},
+            proud_map={}
+        )

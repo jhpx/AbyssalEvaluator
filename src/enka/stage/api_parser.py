@@ -5,6 +5,7 @@ from src.enka.config.constants import EquipmentType, Element
 from src.enka.config.prop_stat import FightPropType
 from src.enka.model.artifact import Artifact
 from src.enka.model.character import Character
+from src.enka.model.character_meta import CharacterMeta
 from src.enka.model.player import Player
 from src.enka.model.stat import Stat, StatType
 from src.enka.model.weapon import Weapon
@@ -99,7 +100,7 @@ class EnkaParser:
 
         # 基础属性
         avatar_id = data.get("avatarId")
-        character_meta = asset_map["character"].get(avatar_id)
+        character_meta = asset_map["character"].get(avatar_id, CharacterMeta.default(avatar_id))
 
         # 等级、经验值、突破
         prop_map = data.get("propMap")
@@ -114,6 +115,7 @@ class EnkaParser:
         fight_prop_map = {
             FightPropType(int(k)): Decimal(str(v))
             for k, v in data.get("fightPropMap", {}).items()
+            if int(k) in FightPropType
         }
 
         # 命座
@@ -121,8 +123,9 @@ class EnkaParser:
         # 天赋等级
         skill_level_map = data.get("skillLevelMap")
         proud_skill_extraL_level_map = data.get("proudSkillExtraLevelMap", {})
-        skill_level_ext = {k: proud_skill_extraL_level_map.get(str(v), 0) for k, v in
-                           character_meta.proud_map.items()}
+        if character_meta:
+            skill_level_ext = {k: proud_skill_extraL_level_map.get(str(v), 0)
+                               for k, v in character_meta.proud_map.items()}
         # 好感度
         friendship_level = data.get("fetterInfo").get("expLevel")
 

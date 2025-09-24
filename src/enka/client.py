@@ -9,7 +9,7 @@ from src.enka.stage.api_parser import EnkaParser
 from src.enka.stage.asset_parser import EnkaAssetParser
 from src.enka.stage.synchronizer import EnkaAssetSynchronizer
 from src.enka.stage.text_displayer import EnkaTextDisplayer
-from src.enka.test_api import TestEnkaApi
+from src.enka.api import EnkaApi
 from src.core.util.duckdb_util import rows_into_model_dict
 from src.core.util.http_util import fetch_and_parse
 
@@ -17,9 +17,9 @@ from src.core.util.http_util import fetch_and_parse
 class EnkaClient:
 
     def __init__(self, lang: Language | str, proxy: str = None):
+        self._db = None
         self._client = httpx.AsyncClient(proxy=proxy)
         self._lang = self._convert_lang(lang)
-        self._db = DuckDBSession()
         self._asset_map = {}
         self._player = None
 
@@ -37,10 +37,11 @@ class EnkaClient:
 
     async def fetch_assets(self):
         """从enka获取最新的静态资源"""
+        self._db = DuckDBSession()
         for name in ("character", "name_card", "pfp", "loc"):
             data = await fetch_and_parse(
                 client=self._client,
-                url=TestEnkaApi.get_url(name),
+                url=EnkaApi.get_url(name),
                 parser=lambda data: EnkaAssetParser.parse(name, data, self._lang)
             )
             # 同步入库并从数据库重新载入缓存
@@ -58,6 +59,7 @@ class EnkaClient:
 
     def refresh_assets(self):
         """从本地数据库获取静态资源"""
+        self._db = DuckDBSession()
         self.refresh_asset("loc")
         self.refresh_asset("name_card")
         self.refresh_asset("pfp")
@@ -74,7 +76,7 @@ class EnkaClient:
         self.refresh_assets()
         self._player = await fetch_and_parse(
             client=self._client,
-            url=TestEnkaApi.get_player_url(uid),
+            url=EnkaApi.get_player_url(uid),
             parser=lambda data: EnkaParser.parse_player(data, self._asset_map)
         )
         return self._player

@@ -53,7 +53,7 @@ CHARACTER_RARITY_MAP: dict[str, Literal[4, 5]] = {
 
 class Element(FromNameMixin, StrEnum):
     """元素类型"""
-
+    UNKNOWN = "❓"
     ICE = "🧊"
     FIRE = "🔥"
     WATER = "💧"

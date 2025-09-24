@@ -1,4 +1,3 @@
-
 from src.core.util.http_util import fetch_and_parse
 from src.core.util.s3_auth import S3RequestsAuth
 from src.enka.client import EnkaClient
@@ -6,7 +5,7 @@ from src.enka.model.character import Character
 from src.enka.model.player import Player
 from src.evaluator.algorithm.stat_based import YSINAlgorithm
 from src.evaluator.algorithm.weight_based import XZSAlgorithm
-from src.evaluator.config.constants import *
+from src.config.oss_conf import *
 from src.evaluator.model.genre import GENRE_DEFAULT
 from src.evaluator.stage.stat_weight_parser import StatWeightParser
 from src.evaluator.stage.synchronizer import StatWeightSynchronizer
@@ -65,7 +64,7 @@ class Evaluator:
         if character.id in self._character_weights_map:
             weights = self._character_weights_map.get(character.id).to_dict()
         elif self._character_weights_map:
-            weights = GENRE_DEFAULT.effective_stat_weights()
+            weights = {k: 1 for k in GENRE_DEFAULT.effective_stats}
         else:
             raise ValueError("没有找到角色权重")
 
